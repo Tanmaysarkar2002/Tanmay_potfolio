@@ -46,6 +46,7 @@
     { p: 1,    wash: "#5d6bb5", night: 1 }
   ];
 
+  var root = document.documentElement;
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var $ = function (s) { return document.querySelector(s); };
   var INK = "#1f1f24", PAPER = "#fbfaf6", ACCENT = "#ff6b35";
@@ -511,7 +512,7 @@
       '<path d="M180 42 L245 0 L310 42 Z" fill="#c1554d" ' + S + '/><path d="M180 42 L245 0 L310 42 Z" fill="url(#hatch)"/>' +
       '<circle cx="245" cy="84" r="25" fill="' + PAPER + '" ' + S + '/><path d="M245 84 V66 M245 84 H257" ' + S + ' stroke-width="3"/>' +
       '<path d="M220 300 V244 a25 25 0 0 1 50 0 V300" fill="#6b4226" ' + S + "/>" +
-      '<rect x="206" y="118" width="78" height="24" rx="3" fill="' + INK + '"/><text x="245" y="136" text-anchor="middle" ' + SKETCH + ' font-size="17" fill="' + PAPER + '">RITS</text>';
+      '<rect x="206" y="118" width="78" height="24" rx="3" fill="' + INK + '"/><text x="245" y="136" text-anchor="middle" ' + SKETCH + ' font-size="17" fill="' + PAPER + '">RIT</text>';
     // Left wing: class-of banner + windows.
     art += '<path d="M24 176 H176 L170 192 L176 208 H24 L30 192 Z" fill="' + ACCENT + '" ' + S + ' stroke-width="2"/>' +
       '<text x="100" y="198" text-anchor="middle" ' + SKETCH + ' font-size="14" fill="#fff">ECE · CLASS OF 2024</text>' +
@@ -772,24 +773,32 @@
   // Sound (WebAudio, synthesised — no files)
   // ------------------------------------------------------------------
   var audio = { on: false, ctx: null };
+  // Smooth parallel-twin drone: detuned saws + sub, soft-clipped, gently pulsed by a sine.
   function initAudio() {
     if (audio.ctx) return;
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     var ctx = new AC(), master = ctx.createGain();
     master.gain.value = 0; master.connect(ctx.destination);
-    var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 320; lp.Q.value = 3; lp.connect(master);
-    var chug = ctx.createGain(); chug.gain.value = 0.5; chug.connect(lp);
-    var o1 = ctx.createOscillator(); o1.type = "sawtooth"; o1.frequency.value = 38; o1.connect(chug);
-    var o2 = ctx.createOscillator(); o2.type = "square"; o2.frequency.value = 19; var g2 = ctx.createGain(); g2.gain.value = 0.35; o2.connect(g2); g2.connect(chug);
-    var lfo = ctx.createOscillator(); lfo.type = "square"; lfo.frequency.value = 9; var lfoG = ctx.createGain(); lfoG.gain.value = 0.45; lfo.connect(lfoG); lfoG.connect(chug.gain);
-    o1.start(); o2.start(); lfo.start();
-    audio.ctx = ctx; audio.master = master; audio.lp = lp; audio.o1 = o1; audio.o2 = o2; audio.lfo = lfo;
+    var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 420; lp.Q.value = 0.8; lp.connect(master);
+    var shaper = ctx.createWaveShaper(), curve = new Float32Array(1024);
+    for (var i = 0; i < 1024; i++) { var x = (i / 1023) * 2 - 1; curve[i] = Math.tanh(2.2 * x); }
+    shaper.curve = curve; shaper.connect(lp);
+    var body = ctx.createGain(); body.gain.value = 0.7; body.connect(shaper);
+    var mk = function (type, f, g) {
+      var o = ctx.createOscillator(), gn = ctx.createGain();
+      o.type = type; o.frequency.value = f; gn.gain.value = g; o.connect(gn); gn.connect(body); o.start(); return o;
+    };
+    var o1 = mk("sawtooth", 32, 0.5), o2 = mk("sawtooth", 32.4, 0.35), sub = mk("sine", 16, 0.8);
+    var lfo = ctx.createOscillator(), lfoG = ctx.createGain();
+    lfo.type = "sine"; lfo.frequency.value = 16; lfoG.gain.value = 0.22; lfo.connect(lfoG); lfoG.connect(body.gain); lfo.start();
+    audio.ctx = ctx; audio.master = master; audio.lp = lp; audio.o1 = o1; audio.o2 = o2; audio.sub = sub; audio.lfo = lfo;
+    audio.last = 0; audio.rev = 0;
   }
   function setSound(on) {
     audio.on = on;
     if (on) { initAudio(); if (audio.ctx && audio.ctx.state === "suspended") audio.ctx.resume(); }
-    if (audio.master) audio.master.gain.setTargetAtTime(on ? 0.05 : 0, audio.ctx.currentTime, 0.1);
+    if (audio.master) audio.master.gain.setTargetAtTime(on ? 0.06 : 0, audio.ctx.currentTime, 0.15);
     $("#sound-btn .wave").setAttribute("opacity", on ? "1" : ".25");
     $("#sound-btn .mute").style.display = on ? "none" : "";
     [].forEach.call(document.querySelectorAll(".sound-state"), function (el) { el.textContent = on ? "ON" : "OFF"; });
@@ -797,12 +806,17 @@
   }
   function engineSound(kmh, gearFrac) {
     if (!audio.on || !audio.ctx) return;
-    var t = audio.ctx.currentTime, f = 34 + kmh * 0.9 + gearFrac * 26;
-    audio.o1.frequency.setTargetAtTime(f, t, 0.08);
-    audio.o2.frequency.setTargetAtTime(f / 2, t, 0.08);
-    audio.lfo.frequency.setTargetAtTime(7 + f / 9, t, 0.08);
-    audio.lp.frequency.setTargetAtTime(280 + kmh * 9, t, 0.1);
-    audio.master.gain.setTargetAtTime(0.045 + Math.min(kmh, 80) / 1400, t, 0.15);
+    var t = audio.ctx.currentTime;
+    if (t - audio.last < 0.05) return; // ~20 updates/s keeps the pitch from jittering
+    audio.last = t;
+    audio.rev *= 0.86;
+    var f = 30 + kmh * 0.85 + gearFrac * 16 + audio.rev * 45;
+    audio.o1.frequency.setTargetAtTime(f, t, 0.12);
+    audio.o2.frequency.setTargetAtTime(f * 1.012, t, 0.12);
+    audio.sub.frequency.setTargetAtTime(f / 2, t, 0.12);
+    audio.lfo.frequency.setTargetAtTime(f / 2, t, 0.12);
+    audio.lp.frequency.setTargetAtTime(380 + kmh * 8 + audio.rev * 500, t, 0.15);
+    audio.master.gain.setTargetAtTime(0.06 + Math.min(kmh, 80) / 1600 + audio.rev * 0.03, t, 0.2);
   }
   function blip(freqs, dur, type, vol) {
     if (!audio.on || !audio.ctx) return;
@@ -942,9 +956,10 @@
   });
 
   // Throttle with W / ↑ / → / Space, brake with S / ↓ / ←. Shift = boost.
-  var throttle = 0, boost = false, throttleVel = 0;
+  var throttle = 0, boost = false, throttleVel = 0, introOpen = !!document.getElementById("intro");
   var FWD = { w: 1, arrowup: 1, arrowright: 1, d: 1, " ": 1 }, BACK = { s: 1, arrowdown: 1, arrowleft: 1, a: 1 };
   window.addEventListener("keydown", function (e) {
+    if (introOpen) return;
     var k = e.key.toLowerCase(), tag = (e.target.tagName || "").toLowerCase();
     if (tag === "input" || tag === "textarea" || ((tag === "button" || tag === "a") && k === " ")) return;
     boost = e.shiftKey;
@@ -962,10 +977,10 @@
   // Frame loop
   // ------------------------------------------------------------------
   var hero = $("#hero"), doodles = $("#doodles"), skyWash = $("#sky-wash"), sun = $("#sun"), moon = $("#moon");
-  var beam = $("#beam"), speedlines = $("#speedlines"), root = document.documentElement;
+  var beam = $("#beam"), speedlines = $("#speedlines");
   var posters = [].slice.call(document.querySelectorAll(".poster"));
   var cur = 0, last = performance.now(), dist = 0, lastNight = -1, lastActive = null;
-  var autoEl = $("#auto"), autoX = 1400, cowBubble = null;
+  var autoEl = $("#auto"), autoX = 2600, cowBubble = null;
   var speed = 0, prevSpeed = 0, wheelie = 0, clock = 0, lastRs = null;
 
   function frame(now) {
@@ -1093,6 +1108,47 @@
     if (isMobile() !== wasMobile) { wasMobile = isMobile(); buildGlow(); }
   });
   setSound(false);
-  showToast("RIDER", 'Scroll or hold <b>W / ↑</b> to ride. Engine sound is <button class="sound-toggle sound-state" type="button">OFF</button>', false, 6500);
+  // ------------------------------------------------------------------
+  // Intro: "Why a motorbike?" + fuel-gauge loader, then kick-start.
+  // ------------------------------------------------------------------
+  function riderHint() {
+    showToast("RIDER", (isMobile() ? "Swipe up" : "Scroll or hold <b>W / ↑</b>") + ' to ride. Engine sound is <button class="sound-toggle sound-state" type="button">' + (audio.on ? "ON" : "OFF") + "</button>", false, 6500);
+  }
+  var intro = $("#intro");
+  if (!intro) { riderHint(); }
+  else {
+    root.style.overflow = "hidden";
+    var STATUS = ["Checking tyre pressure…", "Filling the tank with cutting chai…", "Polishing the chrome…", "Paving the road from Malda to Jaipur…", "Warming up the parallel twin…"];
+    var minMs = reduceMotion ? 300 : 2600, t0 = performance.now(), fontsDone = false, ready = false;
+    var needle = $("#fuel-needle"), statusEl = $("#intro-status"), actions = $("#intro-actions");
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { fontsDone = true; }, function () { fontsDone = true; });
+    setTimeout(function () { fontsDone = true; }, 4000);
+    var tick = function (now) {
+      var p = Math.min(1, (now - t0) / minMs);
+      if (!fontsDone) p = Math.min(p, 0.9);
+      needle.setAttribute("transform", "rotate(" + (-70 + p * 140).toFixed(1) + " 80 80)");
+      if (p < 1) {
+        statusEl.textContent = STATUS[Math.min(STATUS.length - 1, Math.floor(p * STATUS.length))];
+        requestAnimationFrame(tick);
+      } else if (!ready) {
+        ready = true;
+        statusEl.textContent = "Tank's full. Ready to ride.";
+        actions.classList.add("ready");
+        $("#kick-btn").focus({ preventScroll: true });
+      }
+    };
+    requestAnimationFrame(tick);
+    var startRide = function (withSound) {
+      if (!ready) return;
+      if (withSound) { setSound(true); audio.rev = 1; blip([[90, 140]], 0.5, "sawtooth", 0.05); }
+      intro.classList.add("gone");
+      root.style.overflow = "";
+      introOpen = false;
+      setTimeout(function () { intro.hidden = true; }, 700);
+      setTimeout(riderHint, 500);
+    };
+    $("#kick-btn").addEventListener("click", function () { startRide(true); });
+    $("#mute-btn").addEventListener("click", function () { startRide(false); });
+  }
   requestAnimationFrame(frame);
 })();

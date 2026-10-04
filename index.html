@@ -33,9 +33,35 @@
     </defs>
   </svg>
 
+  <!-- Intro: why a motorbike + loading -->
+  <div class="intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+    <div class="intro-card">
+      <p class="intro-eyebrow">before we ride</p>
+      <h2 id="intro-title">Why a motorbike?</h2>
+      <p>My career has felt less like a ladder and more like a road trip: school in Malda, college in Gwalior, a first job in Pune, and now Jaipur. So instead of a list, here's the ride.</p>
+      <blockquote>“Four wheels move the body. Two wheels move the soul.”<cite>a riders' saying</cite></blockquote>
+      <div class="fuel">
+        <svg viewBox="0 0 160 96" aria-hidden="true">
+          <path d="M22 80 A58 58 0 0 1 138 80" fill="none" stroke="#1f1f24" stroke-width="3" stroke-linecap="round"/>
+          <path d="M120 40 A58 58 0 0 1 138 80" fill="none" stroke="#ff6b35" stroke-width="6" stroke-linecap="round" opacity=".7"/>
+          <path d="M28 60 l6 3 M47 38 l5 5 M80 22 v7 M113 38 l-5 5 M132 60 l-6 3" stroke="#1f1f24" stroke-width="2.4" stroke-linecap="round"/>
+          <text x="16" y="94" font-family="Cabin Sketch, cursive" font-weight="700" font-size="16" fill="#1f1f24">E</text>
+          <text x="136" y="94" font-family="Cabin Sketch, cursive" font-weight="700" font-size="16" fill="#1f1f24">F</text>
+          <g id="fuel-needle" transform="rotate(-70 80 80)"><line x1="80" y1="80" x2="80" y2="32" stroke="#ff6b35" stroke-width="4" stroke-linecap="round"/></g>
+          <circle cx="80" cy="80" r="7" fill="#1f1f24"/>
+        </svg>
+        <div><b>FUEL</b><p id="intro-status" aria-live="polite">Checking tyre pressure…</p></div>
+      </div>
+      <div class="intro-actions" id="intro-actions">
+        <button class="btn primary" id="kick-btn" type="button">Kick-start with sound</button>
+        <button class="btn" id="mute-btn" type="button">Ride on mute</button>
+      </div>
+    </div>
+  </div>
+
   <!-- HUD -->
   <header class="hud">
-    <a class="brand" href="#" data-jump="0" aria-label="Back to the garage">TS<span>.dev</span></a>
+    <a class="brand plate" href="#" data-jump="0" aria-label="Tanmay Sarkar, back to the garage"><span class="ind" aria-hidden="true"><i></i>IND</span><b>TANMAY S</b></a>
     <nav class="route" aria-label="Journey checkpoints">
       <div class="route-track"></div><div class="route-fill"></div>
       <div class="route-bike" aria-hidden="true"><svg viewBox="0 0 28 18" width="28" height="18"><circle cx="6" cy="13" r="4.5" fill="#fbfaf6" stroke="#1f1f24" stroke-width="2"/><circle cx="22" cy="13" r="4.5" fill="#fbfaf6" stroke="#1f1f24" stroke-width="2"/><path d="M6 13 L12 7 H18 L22 13 M17 4 L19 7" fill="none" stroke="#1f1f24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 7 Q14 3 18 6 Z" fill="#ff6b35" stroke="#1f1f24" stroke-width="1.5"/></svg></div>
@@ -298,7 +324,7 @@
 
   <div class="scroll-space" id="scroll-space"></div>
 
-  <noscript><style>.stage{position:static;height:auto}.cards{position:static}.cards .card{position:relative;inset:auto;opacity:1;transform:none;margin:24px auto;max-height:none}.rider,.speedo,.toast{display:none}</style></noscript>
+  <noscript><style>.intro{display:none}.stage{position:static;height:auto}.cards{position:static}.cards .card{position:relative;inset:auto;opacity:1;transform:none;margin:24px auto;max-height:none}.rider,.speedo,.toast{display:none}</style></noscript>
   <script src="ride/ride.js"></script>
 </body>
 </html>
