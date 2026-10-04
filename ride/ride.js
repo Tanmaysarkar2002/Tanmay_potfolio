@@ -94,14 +94,6 @@
     return '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + " " + h + '">' +
       (rough === false ? inner : '<g filter="url(#rough)">' + inner + "</g>") + (live || "") + "</svg>";
   }
-  function ridge(width, height, step, base, amp, seed) {
-    var r = rng(seed), d = "M0 " + height, y = base;
-    for (var x = 0; x <= width + step; x += step) {
-      y = Math.max(10, Math.min(height - 10, y + (r() - 0.5) * amp));
-      d += " L" + x + " " + Math.round(height - y);
-    }
-    return d + " L" + (width + step) + " " + height + " Z";
-  }
   // Puffy outline (clouds, tree canopies): thick strokes underneath, paper fill on top.
   function puffs(circles, fill) {
     var under = "", over = "";
@@ -132,7 +124,6 @@
     return { el: el, f: parseFloat(el.getAttribute("data-f")) };
   });
   function layerWidth(f) { return Math.ceil((END + OFFSET) * f + 2800); }
-  function layerU(worldX, f, lead) { return Math.round((worldX + lead + OFFSET) * f); }
 
   // Rough region of the journey for a given world x — scenery changes with it.
   function region(wx) {
@@ -888,7 +879,6 @@
     }
     var p = function (deg, r) { var d = (deg * Math.PI) / 180; return (64 + Math.sin(d) * r).toFixed(1) + " " + (64 - Math.cos(d) * r).toFixed(1); };
     arc = "M" + p(-120, 56) + " A56 56 0 1 1 " + p(120, 56);
-    $(".speedo svg").setAttribute("viewBox", "0 0 128 120");
     $(".speedo svg").innerHTML =
       '<path d="' + arc + ' Z" fill="#fbfaf6" stroke="' + INK + '" stroke-width="2.5" stroke-linejoin="round" filter="url(#rough)"/>' +
       '<path d="M' + p(60, 50) + " A50 50 0 0 1 " + p(120, 50) + '" fill="none" stroke="' + ACCENT + '" stroke-width="5" opacity=".7"/>' +
