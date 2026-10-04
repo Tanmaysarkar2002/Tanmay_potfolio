@@ -196,12 +196,17 @@ button { font: inherit; color: inherit; }
 .card li { margin-bottom: 4px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .chips span { font-size: 15px; padding: 1px 10px; border: 1.8px solid var(--ink); border-radius: 14px 10px 16px 9px; background: #fff; }
+.chips span small { margin-left: 4px; font-size: 13px; color: var(--ink-soft); }
 .stats { display: flex; gap: 10px; margin: 6px 0; flex-wrap: wrap; }
 .stats div { flex: 1; min-width: 96px; border: 2px dashed var(--ink); border-radius: 6px; padding: 6px 10px; background: rgba(255,255,255,.7); }
 .stats b { display: block; font: 700 30px/1.1 var(--sketch); color: var(--accent); }
 .stats span { font-size: 15px; line-height: 1.15; color: var(--ink-soft); display: block; }
 .skillset { margin-bottom: 8px; }
 .skillset h3 { font-size: 16px; text-transform: uppercase; margin: 0; color: var(--ink-soft); letter-spacing: 1px; font-weight: 400; }
+.skillset .chips { gap: 5px; margin-top: 3px; }
+.skillset .chips span { font-size: 14px; padding: 0 8px; }
+.card.wide { width: min(600px, calc(100vw - 32px)); }
+.card.more { -webkit-mask-image: linear-gradient(#000 82%, transparent); mask-image: linear-gradient(#000 82%, transparent); }
 .card.mini { width: min(380px, calc(100vw - 32px)); left: auto; right: 5vw; top: 86px; }
 .cta { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 6px; }
 .btn { text-decoration: none; padding: 6px 14px; border: 2px solid var(--ink); border-radius: 18px 12px 20px 10px; background: #fff; font-size: 18px; }
@@ -311,6 +316,9 @@ button { font: inherit; color: inherit; }
   .sq { min-width: 42px; height: 42px; padding: 0 8px; font-size: 15px; }
   .card { top: 94px; left: 12px; right: 12px; width: auto; max-height: calc(100svh - var(--road-h) - 210px); padding: 18px 16px 14px; }
   .card.mini { left: 12px; right: 12px; width: auto; top: 94px; bottom: auto; }
+  .card.wide { width: auto; }
+  .skillset .chips span { font-size: 13px; }
+  .skillset h3 { font-size: 14px; }
   .card h2 { font-size: 27px; }
   .stats b { font-size: 23px; }
   .stats div { min-width: 80px; padding: 5px 8px; }
