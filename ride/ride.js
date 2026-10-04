@@ -455,27 +455,97 @@
     return svg(660, 340, s);
   }
   function school() {
-    return svg(320, 230,
-      '<rect x="20" y="80" width="260" height="150" fill="' + PAPER + '" ' + S + '/><rect x="20" y="80" width="260" height="150" fill="url(#bricks)"/>' +
-      '<path d="M5 84 L150 26 L295 84 Z" fill="#f2b8a0" ' + S + '/><path d="M5 84 L150 26 L295 84 Z" fill="url(#hatch)"/>' +
-      '<rect x="122" y="160" width="56" height="70" fill="' + PAPER + '" ' + S + '/><path d="M150 160 V230" ' + S + "/>" +
-      '<rect x="92" y="90" width="116" height="28" rx="4" fill="' + PAPER + '" ' + S + ' stroke-width="2"/>' +
-      '<text x="150" y="110" text-anchor="middle" ' + SKETCH + ' font-size="17" fill="' + INK + '">KV MALDA</text>' +
-      grid(38, 132, 2, 2, 38, 44, 26, 28, 'fill="#cfe6f5" ' + S + ' stroke-width="2"') + grid(208, 132, 2, 2, 38, 44, 26, 28, 'fill="#cfe6f5" ' + S + ' stroke-width="2"') +
-      '<path d="M300 230 V0" ' + S + ' stroke-width="3"/>' +
-      '<rect x="301" y="4" width="42" height="9" fill="#ff9933"/><rect x="301" y="13" width="42" height="9" fill="#fff"/><rect x="301" y="22" width="42" height="9" fill="#138808"/>' +
-      '<rect x="301" y="4" width="42" height="27" fill="none" ' + S + ' stroke-width="1.6"/><circle cx="322" cy="17.5" r="3" fill="none" stroke="#000080" stroke-width="1.2"/>');
+    var art = "", live = "", i;
+    // Blackboard on an easel — where the coding started.
+    art += '<path d="M24 260 L40 150 M104 260 L88 150 M64 150 V260" ' + S + ' stroke-width="3" fill="none"/>' +
+      '<rect x="10" y="146" width="112" height="72" rx="3" fill="#2f4f3a" stroke="#8a6a43" stroke-width="5"/>' +
+      '<text x="18" y="166" ' + HAND + ' font-size="13" fill="#f1f1e6">print("hello,</text>' +
+      '<text x="30" y="182" ' + HAND + ' font-size="13" fill="#f1f1e6">world")</text>' +
+      '<text x="18" y="202" ' + HAND + ' font-size="12" fill="#ffd166">PCM + CS ✓</text>' +
+      '<path d="M88 196 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0 M84 196 q12 -12 24 0 q-12 12 -24 0" stroke="#f1f1e6" stroke-width="1" fill="none"/>';
+    // Two-storey school with an arched verandah (cream + brick red, KV style).
+    art += '<rect x="140" y="92" width="320" height="168" fill="#f6e7c8" ' + S + "/>" +
+      '<rect x="132" y="82" width="336" height="14" fill="#c1554d" ' + S + "/>" +
+      '<rect x="140" y="170" width="320" height="9" fill="#c1554d" ' + S + ' stroke-width="1.6"/>';
+    for (i = 0; i < 6; i++) {
+      var wx = 156 + i * 50;
+      art += '<rect x="' + wx + '" y="106" width="28" height="36" fill="#cfe6f5" ' + S + ' stroke-width="1.8"/>' +
+        '<path d="M' + (wx + 14) + " 106 V142 M" + wx + ' 124 H' + (wx + 28) + '" stroke="' + INK + '" stroke-width="1.2"/>' +
+        '<path d="M' + (wx - 4) + " 146 H" + (wx + 32) + '" ' + S + ' stroke-width="2"/>';
+      art += '<path d="M' + (wx - 4) + " 260 V212 a18 18 0 0 1 36 0 V260 Z" + '" fill="#e9d3a8" ' + S + ' stroke-width="2"/>' +
+        '<path d="M' + (wx - 4) + " 260 V212 a18 18 0 0 1 36 0 V260 Z" + '" fill="url(#hatch-light)"/>';
+    }
+    art += '<path d="M150 184 v10 M146 194 q4 10 8 0 z" ' + S + ' stroke-width="1.8" fill="#e6c35c"/>';
+    // Name board on the parapet.
+    art += '<rect x="196" y="38" width="208" height="44" rx="6" fill="' + PAPER + '" ' + S + "/>" +
+      '<text x="300" y="58" text-anchor="middle" ' + SKETCH + ' font-size="15" fill="' + INK + '">KENDRIYA VIDYALAYA</text>' +
+      '<text x="300" y="75" text-anchor="middle" ' + HAND + ' font-size="14" fill="' + ACCENT + '">MALDA</text>' +
+      '<path d="M214 82 V94 M386 82 V94" ' + S + ' stroke-width="2"/>';
+    // Flagpole with the tricolour.
+    art += '<path d="M482 260 V20" ' + S + ' stroke-width="3"/><path d="M474 260 h16" ' + S + ' stroke-width="4"/>' +
+      '<rect x="483" y="24" width="42" height="9" fill="#ff9933"/><rect x="483" y="33" width="42" height="9" fill="#fff"/><rect x="483" y="42" width="42" height="9" fill="#138808"/>' +
+      '<rect x="483" y="24" width="42" height="27" fill="none" ' + S + ' stroke-width="1.6"/><circle cx="504" cy="37.5" r="3" fill="none" stroke="#000080" stroke-width="1.2"/>';
+    // Yellow school bus.
+    art += '<rect x="510" y="184" width="170" height="60" rx="10" fill="#ffc93c" ' + S + "/>" +
+      grid(522, 194, 6, 1, 24, 0, 18, 18, 'fill="#cfe6f5" ' + S + ' stroke-width="1.6"') +
+      '<path d="M510 222 H680" stroke="' + INK + '" stroke-width="2"/>' +
+      '<text x="590" y="238" text-anchor="middle" ' + SKETCH + ' font-size="13" fill="' + INK + '">SCHOOL BUS</text>' +
+      '<circle cx="540" cy="246" r="13" fill="' + INK + '"/><circle cx="650" cy="246" r="13" fill="' + INK + '"/>' +
+      '<circle cx="540" cy="246" r="5" fill="#c9ccd1"/><circle cx="650" cy="246" r="5" fill="#c9ccd1"/>' +
+      '<circle cx="676" cy="230" r="4" fill="#fff6d8" ' + S + ' stroke-width="1.4"/>';
+    // Paper planes drifting out of an upper window.
+    var plane = function (x, y, d) {
+      return '<g class="plane" style="animation-delay:' + d + 's"><path d="M' + x + " " + y + " l22 -6 l-14 12 z M" + x + " " + y + " l8 2 l-2 8 z" + '" fill="#fff" ' + S + ' stroke-width="1.4"/></g>';
+    };
+    live += plane(370, 120, 0) + plane(220, 118, -2.6);
+    return svg(690, 260, art, true, live);
   }
+
   function college() {
-    return svg(430, 280,
-      '<rect x="10" y="120" width="410" height="160" fill="#f3e6c4" ' + S + "/>" +
-      '<rect x="165" y="36" width="100" height="244" fill="' + PAPER + '" ' + S + '/><rect x="165" y="36" width="100" height="244" fill="url(#bricks)"/>' +
-      '<path d="M154 38 L215 0 L276 38 Z" fill="#c1554d" ' + S + '/><path d="M154 38 L215 0 L276 38 Z" fill="url(#hatch)"/>' +
-      '<circle cx="215" cy="80" r="25" fill="' + PAPER + '" ' + S + '/><path d="M215 80 V62 M215 80 H229" ' + S + ' stroke-width="3"/>' +
-      '<rect x="36" y="128" width="104" height="26" rx="3" fill="' + INK + '"/><text x="88" y="147" text-anchor="middle" ' + SKETCH + ' font-size="17" fill="' + PAPER + '">RITS</text>' +
-      '<path d="M190 280 V222 a25 25 0 0 1 50 0 V280" fill="' + PAPER + '" ' + S + "/>" +
-      grid(30, 170, 4, 2, 32, 48, 18, 28, 'fill="#cfe6f5" ' + S + ' stroke-width="1.8"') + grid(288, 140, 4, 3, 32, 44, 18, 28, 'fill="#cfe6f5" ' + S + ' stroke-width="1.8"') +
-      '<path d="M10 120 H420" stroke="' + INK + '" stroke-width="5"/>');
+    var art = "", live = "", i;
+    // Wings + clock tower.
+    art += '<rect x="10" y="130" width="180" height="170" fill="#f3e6c4" ' + S + "/>" +
+      '<rect x="300" y="130" width="180" height="170" fill="#f3e6c4" ' + S + "/>" +
+      '<path d="M4 130 H196 M294 130 H486" stroke="' + INK + '" stroke-width="5"/>' +
+      '<rect x="190" y="40" width="110" height="260" fill="' + PAPER + '" ' + S + '/><rect x="190" y="40" width="110" height="260" fill="url(#bricks)"/>' +
+      '<path d="M180 42 L245 0 L310 42 Z" fill="#c1554d" ' + S + '/><path d="M180 42 L245 0 L310 42 Z" fill="url(#hatch)"/>' +
+      '<circle cx="245" cy="84" r="25" fill="' + PAPER + '" ' + S + '/><path d="M245 84 V66 M245 84 H257" ' + S + ' stroke-width="3"/>' +
+      '<path d="M220 300 V244 a25 25 0 0 1 50 0 V300" fill="#6b4226" ' + S + "/>" +
+      '<rect x="206" y="118" width="78" height="24" rx="3" fill="' + INK + '"/><text x="245" y="136" text-anchor="middle" ' + SKETCH + ' font-size="17" fill="' + PAPER + '">RITS</text>';
+    // Left wing: class-of banner + windows.
+    art += '<path d="M24 176 H176 L170 192 L176 208 H24 L30 192 Z" fill="' + ACCENT + '" ' + S + ' stroke-width="2"/>' +
+      '<text x="100" y="198" text-anchor="middle" ' + SKETCH + ' font-size="14" fill="#fff">ECE · CLASS OF 2024</text>' +
+      grid(26, 142, 5, 1, 32, 0, 18, 24, 'fill="#cfe6f5" ' + S + ' stroke-width="1.6"') +
+      grid(26, 222, 5, 2, 32, 38, 18, 26, 'fill="#cfe6f5" ' + S + ' stroke-width="1.6"');
+    // Right wing: an ECE lab with circuit traces running across the wall.
+    art += '<rect x="318" y="146" width="144" height="26" rx="3" fill="' + PAPER + '" ' + S + ' stroke-width="2"/>' +
+      '<text x="390" y="164" text-anchor="middle" ' + HAND + ' font-size="15" fill="' + INK + '">ELECTRONICS LAB</text>' +
+      '<path d="M300 200 H340 V230 H390 V210 H440 M300 260 H360 V240 H420 V270 H480 M340 300 V280 H380" stroke="#2a9d8f" stroke-width="2.4" fill="none"/>' +
+      '<rect x="400" y="222" width="34" height="14" rx="2" fill="#e6c35c" ' + S + ' stroke-width="1.4"/><path d="M408 222 v14 M416 222 v14 M424 222 v14" stroke="#c1554d" stroke-width="2"/>' +
+      '<rect x="436" y="250" width="30" height="30" fill="' + INK + '"/><path d="M436 256 h-5 M436 264 h-5 M436 272 h-5 M466 256 h5 M466 264 h5 M466 272 h5" stroke="' + INK + '" stroke-width="2"/>';
+    [[340, 200, "#ff6b35", 0], [440, 210, "#2ec4b6", 0.4], [360, 260, "#ffd166", 0.8], [480, 270, "#e63946", 0.2], [380, 280, "#2ec4b6", 1]].forEach(function (l) {
+      live += '<circle class="led" cx="' + l[0] + '" cy="' + l[1] + '" r="5" fill="' + l[2] + '" stroke="' + INK + '" stroke-width="1.6" style="animation-delay:' + l[3] + 's"/>';
+    });
+    // Satellite dish on the roof — the "Communication" in ECE.
+    art += '<path d="M420 130 V112 M412 130 h16" ' + S + ' stroke-width="3"/>' +
+      '<path d="M400 112 Q420 76 446 98 Z" fill="' + PAPER + '" ' + S + "/>" + '<path d="M423 103 l12 -14" ' + S + ' stroke-width="2"/>';
+    for (i = 0; i < 3; i++) live += '<path class="wave" d="M' + (440 + i * 9) + " " + (82 - i * 9) + " q" + (8 + i * 4) + " " + (4 + i * 3) + " " + (6 + i * 3) + " " + (16 + i * 6) + '" stroke="' + INK + '" stroke-width="2" fill="none" style="animation-delay:' + i * 0.35 + 's"/>';
+    // Canteen kiosk.
+    art += '<rect x="500" y="214" width="110" height="86" fill="#ffe08a" ' + S + "/>";
+    for (i = 0; i < 5; i++) art += '<path d="M' + (494 + i * 24.4) + " 200 h24.4 v18 a12.2 8 0 0 1 -24.4 0 z" + '" fill="' + (i % 2 ? PAPER : "#2a9d8f") + '" ' + S + ' stroke-width="1.8"/>';
+    art += '<rect x="510" y="176" width="90" height="24" rx="3" fill="' + PAPER + '" ' + S + ' stroke-width="2"/>' +
+      '<text x="555" y="193" text-anchor="middle" ' + SKETCH + ' font-size="14" fill="' + INK + '">CANTEEN</text>' +
+      '<text x="555" y="250" text-anchor="middle" ' + HAND + ' font-size="14" fill="' + INK + '">chai · maggi</text>' +
+      '<text x="555" y="268" text-anchor="middle" ' + HAND + ' font-size="14" fill="' + INK + '">samosa ₹10</text>' +
+      '<path d="M540 300 V284 h30 v16" ' + S + ' stroke-width="2" fill="none"/>';
+    // Graduation caps tossed in the air.
+    var cap = function (x, y, d) {
+      return '<g class="cap" style="animation-delay:' + d + 's"><g transform="translate(' + x + " " + y + ')">' +
+        '<path d="M-16 0 L0 -7 L16 0 L0 7 Z" fill="' + INK + '"/><path d="M-9 3 V9 Q0 14 9 9 V3" fill="' + INK + '"/>' +
+        '<path d="M0 0 L12 4 V12" stroke="#ffd166" stroke-width="1.6" fill="none"/></g></g>';
+    };
+    live += cap(130, 112, 0) + cap(345, 104, -0.9) + cap(165, 92, -1.8);
+    return svg(620, 300, art, true, live);
   }
   function pune() {
     return svg(390, 340,
@@ -792,10 +862,11 @@
   // ------------------------------------------------------------------
   // Rider
   // ------------------------------------------------------------------
+  // Cross-laced wire spokes.
   var spokes = "";
-  for (var i = 0; i < 6; i++) {
-    var a = (i / 6) * Math.PI * 2;
-    spokes += '<line x1="0" y1="0" x2="' + (Math.cos(a) * 22).toFixed(1) + '" y2="' + (Math.sin(a) * 22).toFixed(1) + '" stroke="' + INK + '" stroke-width="2.4"/>';
+  for (var i = 0; i < 20; i++) {
+    var a = (i / 20) * Math.PI * 2, b2 = a + (i % 2 ? 0.55 : -0.55);
+    spokes += '<line x1="' + (Math.cos(a) * 5).toFixed(1) + '" y1="' + (Math.sin(a) * 5).toFixed(1) + '" x2="' + (Math.cos(b2) * 27).toFixed(1) + '" y2="' + (Math.sin(b2) * 27).toFixed(1) + '" stroke="#55565f" stroke-width="1.1"/>';
   }
   [].forEach.call(document.querySelectorAll(".rider .spokes"), function (g) { g.innerHTML = spokes; });
   var wheelR = $("#wheel-r"), wheelF = $("#wheel-f"), bikeG = $("#bike"), riderEl = $("#rider");
@@ -822,7 +893,7 @@
     var p = puffPool.filter(function (q) { return q.life <= 0; })[0];
     if (!p) return;
     var r = riderEl.getBoundingClientRect(), k = r.width / 240;
-    p.x = r.left + 18 * k - 9; p.y = r.top + 120 * k - 9; p.life = 1; p.vx = -20 - Math.random() * 30; p.vy = -14 - Math.random() * 14;
+    p.x = r.left + 18 * k - 9; p.y = r.top + 129 * k - 9; p.life = 1; p.vx = -20 - Math.random() * 30; p.vy = -14 - Math.random() * 14;
   }
   function updatePuffs(dt, camDx) {
     puffPool.forEach(function (p) {
@@ -921,8 +992,8 @@
     layers.forEach(function (l) { l.el.style.transform = "translate3d(" + (-(camX + OFFSET) * l.f).toFixed(1) + "px,0,0)"; });
     if (rs !== lastRs) {
       riderEl.style.transform = "translate3d(" + rs.toFixed(1) + "px,0,0)";
-      // Headlight sits at (182, 66) in the 240x170 bike drawing.
-      var headY = (mobile ? -42 : -62) + (170 - 66) * k;
+      // Headlight sits at (182, 64) in the 240x170 bike drawing.
+      var headY = (mobile ? -42 : -62) + (170 - 64) * k;
       beam.style.bottom = "calc(var(--road-h) + " + (headY - 90).toFixed(1) + "px)";
       beam.style.transform = "translate3d(" + (rs + 186 * k).toFixed(1) + "px,0,0)";
       speedlines.style.left = (rs - 120 * k) + "px";

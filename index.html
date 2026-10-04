@@ -129,48 +129,78 @@
     <div class="rider" id="rider" role="button" tabindex="0" aria-label="Honk the horn">
       <svg viewBox="0 0 240 170" aria-hidden="true">
         <g id="bike">
-          <!-- exhaust -->
-          <path class="ink" d="M104 132 L36 122 L22 118 L20 126 L36 130 L100 140 Z" fill="#d9d6ce"/>
-          <!-- rear wheel -->
+          <!-- far-side peashooter -->
+          <path class="ink" d="M100 128 L34 114 Q26 113 26 118 Q28 122 34 122 L100 134 Z" fill="#9aa0a8"/>
+          <!-- wire-spoked wheels -->
           <g transform="translate(58 132)">
             <circle r="33" class="tyre"/>
-            <g id="wheel-r"><circle r="33" class="tread"/><circle r="22" fill="none" stroke="#1f1f24" stroke-width="1.6"/><g class="spokes"></g></g>
-            <circle r="5" fill="#1f1f24"/>
+            <g id="wheel-r"><circle r="33" class="tread"/><circle r="27.5" fill="none" stroke="#9aa0a8" stroke-width="2.2"/><g class="spokes"></g></g>
+            <circle r="6" fill="#c9ccd1" stroke="#1f1f24" stroke-width="2"/>
           </g>
-          <!-- front wheel -->
           <g transform="translate(194 132)">
             <circle r="33" class="tyre"/>
-            <g id="wheel-f"><circle r="33" class="tread"/><circle r="22" fill="none" stroke="#1f1f24" stroke-width="1.6"/><g class="spokes"></g></g>
-            <circle r="5" fill="#1f1f24"/>
+            <g id="wheel-f"><circle r="33" class="tread"/><circle r="27.5" fill="none" stroke="#9aa0a8" stroke-width="2.2"/><g class="spokes"></g></g>
+            <circle r="11" fill="none" stroke="#9aa0a8" stroke-width="3"/>
+            <circle r="6" fill="#c9ccd1" stroke="#1f1f24" stroke-width="2"/>
           </g>
-          <!-- body -->
-          <path class="ink" d="M24 112 Q34 86 76 92" fill="none"/>
-          <path class="ink" d="M58 132 L114 124" fill="none" stroke-width="5"/>
-          <path class="ink" d="M114 124 L150 74 M100 100 L92 72" fill="none" stroke-width="4"/>
-          <rect class="ink" x="98" y="98" width="48" height="34" rx="6" fill="url(#hatch)"/>
-          <path class="ink" d="M104 104 V128 M112 104 V128 M120 104 V128 M128 104 V128 M136 104 V128" stroke-width="1.4" fill="none"/>
-          <path class="ink" d="M170 58 L194 132 M178 56 L200 126" fill="none" stroke-width="4"/>
-          <path class="ink" d="M174 112 Q194 90 216 106" fill="none"/>
-          <path class="ink" d="M56 78 L36 72 L40 86 Z" fill="#fbfaf6"/>
-          <circle cx="38" cy="78" r="3" fill="#e63946"/>
-          <path class="ink" d="M62 78 Q72 66 112 70 L110 80 L64 84 Z" fill="#1f1f24"/>
-          <path class="ink" d="M108 70 Q118 48 152 52 L166 68 Q144 80 110 78 Z" fill="#ff6b35"/>
-          <path d="M118 62 Q138 54 158 60" stroke="#fbfaf6" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <circle class="ink" cx="182" cy="66" r="10" fill="#fff6d8"/>
-          <circle cx="184" cy="66" r="4" fill="#ffd166"/>
-          <path class="ink" d="M164 44 L176 54 M160 44 L168 42" fill="none" stroke-width="3.5"/>
-          <!-- rider -->
-          <path class="scarf" d="M136 34 C118 30 104 38 86 30 C96 40 112 40 124 42 Z" fill="#ff6b35" stroke="#1f1f24" stroke-width="1.8" stroke-linejoin="round"/>
-          <path class="ink" d="M98 70 L136 88 L122 120" fill="none" stroke-width="12" stroke="#1f1f24"/>
-          <path class="ink" d="M98 70 L136 88 L122 120" fill="none" stroke-width="7" stroke="#3a4a6b"/>
-          <path class="ink" d="M114 120 L132 122 L130 128 L112 127 Z" fill="#1f1f24"/>
-          <path class="ink" d="M84 70 L100 48 L138 26 L152 40 L114 74 Z" fill="#2f3a55"/>
-          <path class="ink" d="M86 52 L96 34 L114 42 L104 60 Z" fill="#c8a46a"/>
-          <text x="112" y="56" font-family="Patrick Hand" font-size="12" fill="#fbfaf6" transform="rotate(-32 112 56)">&lt;/&gt;</text>
-          <path class="ink" d="M140 32 L156 54 L170 46" fill="none" stroke-width="7" stroke="#2f3a55"/>
-          <circle class="ink" cx="152" cy="18" r="15" fill="#fbfaf6"/>
-          <path d="M140 12 Q152 2 166 12" stroke="#ff6b35" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <path class="ink" d="M154 16 Q166 14 168 24 L156 26 Z" fill="#1f1f24"/>
+          <!-- rear: fender, twin shocks, swingarm -->
+          <path d="M24 114 Q30 94 62 96" fill="none" stroke="#1f1f24" stroke-width="6" stroke-linecap="round"/>
+          <path d="M24 114 Q30 94 62 96" fill="none" stroke="#e6e8eb" stroke-width="3" stroke-linecap="round"/>
+          <path d="M66 126 L78 86" stroke="#1f1f24" stroke-width="5" stroke-linecap="round"/>
+          <path d="M67 120 l8 -3 l-6 -4 l8 -3 l-6 -4 l8 -3 l-6 -4 l8 -3" fill="none" stroke="#e6e8eb" stroke-width="1.8"/>
+          <path class="ink" d="M58 132 L112 126" fill="none" stroke-width="5"/>
+          <!-- frame -->
+          <path class="ink" d="M112 126 L148 74 M100 106 L94 74 M94 74 L160 60" fill="none" stroke-width="4"/>
+          <!-- parallel-twin engine -->
+          <rect class="ink" x="100" y="106" width="52" height="28" rx="8" fill="#d6d9dd"/>
+          <path class="ink" d="M112 106 L116 82 H148 L146 106 Z" fill="#c9ccd1"/>
+          <path d="M117 87 H147 M116 91 H147 M115 95 H147 M114 99 H146 M113 103 H146" stroke="#1f1f24" stroke-width="1.3"/>
+          <rect class="ink" x="114" y="77" width="36" height="6" rx="2" fill="#9aa0a8"/>
+          <circle class="ink" cx="122" cy="121" r="9" fill="#eef0f2"/><circle cx="122" cy="121" r="3" fill="#9aa0a8"/>
+          <!-- near-side header + peashooter -->
+          <path d="M146 98 Q162 112 152 130 Q144 140 112 140 H98" fill="none" stroke="#1f1f24" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M146 98 Q162 112 152 130 Q144 140 112 140 H98" fill="none" stroke="#eef0f2" stroke-width="3.5" stroke-linecap="round"/>
+          <path class="ink" d="M102 136 L28 124 Q20 123 20 129 Q22 134 28 134 L102 144 Z" fill="#eef0f2"/>
+          <path d="M96 139 L32 128" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          <!-- side panel, cafe seat, rear cowl -->
+          <path class="ink" d="M74 86 L96 86 L98 102 L80 102 Z" fill="#1f1f24"/>
+          <path class="ink" d="M64 80 Q70 72 100 74 L100 84 L66 86 Z" fill="#3b2a20"/>
+          <path d="M74 77 v8 M82 75 v9 M90 75 v9" stroke="#8a6a43" stroke-width="1.2"/>
+          <path class="ink" d="M40 78 Q42 64 62 70 Q66 74 66 86 L44 88 Q38 86 40 78 Z" fill="#c8102e"/>
+          <path d="M44 74 Q52 68 60 72" stroke="#fbfaf6" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle class="ink" cx="40" cy="86" r="3.2" fill="#e63946" stroke-width="1.4"/>
+          <!-- long cafe tank -->
+          <path class="ink" d="M98 74 Q102 56 132 54 L160 56 Q172 60 168 74 Q150 84 104 84 Z" fill="#c8102e"/>
+          <path d="M108 72 Q119 65 130 72 Q119 79 108 72 Z" fill="#8f0b20" opacity=".65"/>
+          <path d="M106 62 Q134 52 164 60" stroke="#fbfaf6" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          <circle class="ink" cx="144" cy="67" r="5" fill="#e6c35c" stroke-width="1.6"/>
+          <circle class="ink" cx="134" cy="55" r="3" fill="#eef0f2" stroke-width="1.4"/>
+          <!-- forks, fender, headlamp, clocks, clip-ons -->
+          <path d="M164 60 L190 132 M172 58 L198 128" stroke="#1f1f24" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M164 60 L190 132 M172 58 L198 128" stroke="#e6e8eb" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M178 108 Q196 94 214 106" fill="none" stroke="#1f1f24" stroke-width="6" stroke-linecap="round"/>
+          <path d="M178 108 Q196 94 214 106" fill="none" stroke="#e6e8eb" stroke-width="3" stroke-linecap="round"/>
+          <circle class="ink" cx="182" cy="64" r="12" fill="#e6e8eb"/>
+          <circle cx="183" cy="64" r="8" fill="#fff6d8" stroke="#1f1f24" stroke-width="1.4"/>
+          <circle cx="185" cy="62" r="3" fill="#ffd166"/>
+          <circle class="ink" cx="167" cy="47" r="4.6" fill="#fbfaf6" stroke-width="1.8"/>
+          <circle class="ink" cx="176" cy="49" r="4.6" fill="#fbfaf6" stroke-width="1.8"/>
+          <path class="ink" d="M158 60 L172 63" fill="none" stroke-width="4"/>
+          <!-- rider: cafe-racer crouch, open-face helmet + goggles -->
+          <path class="scarf" d="M138 36 C120 32 106 40 88 32 C98 42 114 42 126 44 Z" fill="#ff6b35" stroke="#1f1f24" stroke-width="1.8" stroke-linejoin="round"/>
+          <path class="ink" d="M96 70 L132 92 L116 118" fill="none" stroke-width="12" stroke="#1f1f24"/>
+          <path class="ink" d="M96 70 L132 92 L116 118" fill="none" stroke-width="7" stroke="#3a4a6b"/>
+          <path class="ink" d="M108 118 L128 120 L126 127 L106 125 Z" fill="#6b4226"/>
+          <path class="ink" d="M86 74 L100 52 L140 32 L154 46 L114 78 Z" fill="#5a3a24"/>
+          <path d="M104 60 L144 38" stroke="#8a5a3a" stroke-width="2" stroke-linecap="round"/>
+          <path class="ink" d="M88 56 L98 38 L116 46 L106 64 Z" fill="#c8a46a"/>
+          <text x="112" y="60" font-family="Patrick Hand" font-size="12" fill="#fbfaf6" transform="rotate(-30 112 60)">&lt;/&gt;</text>
+          <path class="ink" d="M142 38 L156 56 L168 62" fill="none" stroke-width="7" stroke="#5a3a24"/>
+          <path class="ink" d="M158 30 Q168 32 168 40 L158 40 Z" fill="#e0a982" stroke-width="1.6"/>
+          <circle class="ink" cx="154" cy="22" r="14" fill="#fbfaf6"/>
+          <path d="M141 18 Q152 6 166 14" stroke="#c8102e" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M142 26 L168 22" stroke="#1f1f24" stroke-width="3"/>
+          <ellipse class="ink" cx="165" cy="24" rx="5.5" ry="4.5" fill="#ffb627" stroke-width="1.8"/>
         </g>
       </svg>
     </div>
