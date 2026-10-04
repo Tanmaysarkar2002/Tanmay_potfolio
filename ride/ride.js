@@ -41,7 +41,8 @@
     ["cow",       "COW WHISPERER", "Honked at the cow", true],
     ["backwards", "BACK TO SCHOOL", "Rode backwards past the school", true],
     ["sudo",      "ROOT ACCESS",   "Typed sudo ride", true],
-    ["moon",      "MOONLIGHTER",   "Clicked the moon", true]
+    ["moon",      "MOONLIGHTER",   "Clicked the moon", true],
+    ["think",     "DEEP THOUGHTS", "Stopped long enough for the rider to think", true]
   ];
 
   // Sky wash + night amount along the journey.
@@ -774,6 +775,41 @@
       '<path d="M6 230 h16" ' + S + ' stroke-width="5"/>');
   }
 
+  // Roadside quote boards (wooden) and mountain-road warning signs (yellow).
+  function quoteBoard(lines, by) {
+    var h = 34 + lines.length * 22, w = 236, text = "";
+    lines.forEach(function (l, i) { text += '<text x="' + w / 2 + '" y="' + (32 + i * 22) + '" text-anchor="middle" ' + HAND + ' font-size="18" fill="' + INK + '">' + l + "</text>"; });
+    return svg(w, h + 92,
+      '<path d="M44 ' + h + " V" + (h + 92) + " M" + (w - 44) + " " + h + " V" + (h + 92) + '" ' + S + ' stroke-width="6"/>' +
+      '<rect x="4" y="4" width="' + (w - 8) + '" height="' + h + '" rx="6" fill="#d9b382" ' + S + "/>" +
+      '<rect x="14" y="12" width="' + (w - 28) + '" height="' + (h - 16) + '" rx="3" fill="' + PAPER + '" stroke="' + INK + '" stroke-width="1.6"/>' +
+      '<circle cx="11" cy="11" r="2.4" fill="' + INK + '"/><circle cx="' + (w - 11) + '" cy="11" r="2.4" fill="' + INK + '"/>' + text +
+      '<text x="' + (w - 22) + '" y="' + (h - 10) + '" text-anchor="end" ' + HAND + ' font-size="14" fill="' + ACCENT + '">— ' + by + "</text>");
+  }
+  function warningSign(lines, tag) {
+    var h = 40 + lines.length * 26, w = 230, text = "";
+    var longest = Math.max.apply(null, lines.map(function (l) { return l.length; }));
+    var fs = Math.min(21, Math.floor(196 / (longest * 0.62)));
+    lines.forEach(function (l, i) { text += '<text x="' + w / 2 + '" y="' + (34 + i * 26) + '" text-anchor="middle" ' + SKETCH + ' font-size="' + fs + '" fill="' + INK + '">' + l + "</text>"; });
+    return svg(w, h + 100,
+      '<path d="M' + w / 2 + " " + h + " V" + (h + 100) + '" ' + S + ' stroke-width="6"/>' +
+      '<rect x="4" y="4" width="' + (w - 8) + '" height="' + h + '" rx="8" fill="#ffd60a" ' + S + ' stroke-width="3"/>' +
+      '<rect x="12" y="12" width="' + (w - 24) + '" height="' + (h - 16) + '" rx="5" fill="none" stroke="' + INK + '" stroke-width="1.6"/>' + text +
+      '<text x="' + w / 2 + '" y="' + (h - 12) + '" text-anchor="middle" ' + HAND + ' font-size="12" fill="' + INK + '">' + (tag || "BRO") + "</text>");
+  }
+  var ROADSIDE = [
+    [950,   quoteBoard(["Not all those who", "wander are lost."], "J.R.R. Tolkien")],
+    [2650,  quoteBoard(["Arise, awake, and stop", "not till the goal", "is reached."], "Swami Vivekananda")],
+    [4600,  quoteBoard(["Simplicity is", "prerequisite for", "reliability."], "Edsger W. Dijkstra")],
+    [6000,  quoteBoard(["Talk is cheap.", "Show me the code."], "Linus Torvalds")],
+    [5700,  warningSign(["ROAD IS HILLY", "DON'T DRIVE SILLY"])],
+    [7760,  warningSign(["PEEP PEEP", "DON'T SLEEP"])],
+    [8150,  quoteBoard(["Make it work,", "make it right,", "make it fast."], "Kent Beck")],
+    [9620,  warningSign(["BE GENTLE ON", "MY CURVES"], "BRO · HIMANK")],
+    [10930, warningSign(["WE CUT MOUNTAINS", "BUT CONNECT HEARTS"], "BRO · HIMANK")],
+    [11250, quoteBoard(["Life is like riding a", "bicycle. To keep your", "balance, you must", "keep moving."], "Albert Einstein")]
+  ];
+
   var LAMP_XS = [];
   for (var lx = 700; lx < END + 1400; lx += 1100) LAMP_XS.push(lx);
 
@@ -786,10 +822,11 @@
     [CP.garage.x + 320, pitstop()],
     [CP.ladakh.x + 300, khardungLa(), "ladakh"],
     [CP.projects.x + 120, washingLine(), "line"],
-    [COW_X, cow() + '<div class="bubble">moo!</div>', "cow"],
+    [COW_X, cow() + '<div class="bubble">moo!</div>', "cow"]
+  ].concat(ROADSIDE).concat([
     [CP.garage.x + 820, sleepyDog(), "dog"],
     [END + 200, chaiStall(), "chai"]
-  ];
+  ]);
   var CHAI_X = END + 200;
 
   function buildGround() {
@@ -976,6 +1013,34 @@
   }
   [].forEach.call(document.querySelectorAll(".rider .spokes"), function (g) { g.innerHTML = spokes; });
   var wheelR = $("#wheel-r"), wheelF = $("#wheel-f"), bikeG = $("#bike"), riderEl = $("#rider");
+
+  // Pause for a few seconds and the rider starts thinking out loud.
+  var THOUGHTS = [
+    ["The journey of a thousand miles begins with a single step.", "Lao Tzu"],
+    ["Dream is not that which you see while sleeping, it is something that does not let you sleep.", "A.P.J. Abdul Kalam"],
+    ["Any fool can write code that a computer can understand. Good programmers write code that humans can understand.", "Martin Fowler"],
+    ["Premature optimization is the root of all evil.", "Donald Knuth"],
+    ["Better Mr. Late than late Mr.", "BRO road sign"],
+    ["Life is short, don't make it shorter.", "BRO road sign"]
+  ];
+  var thoughtEl = document.createElement("div"), thoughtI = 0, idleSince = 0, thinking = false;
+  thoughtEl.className = "thought";
+  thoughtEl.setAttribute("aria-live", "polite");
+  riderEl.appendChild(thoughtEl);
+  function updateThought(now, kmh) {
+    var idle = kmh < 1 && !introOpen && cur > 300 && cur < END - 300 && !(isMobile() && lastActive);
+    if (!idle) idleSince = 0; else if (!idleSince) idleSince = now;
+    if (idle && now - idleSince > 3500 && !thinking) {
+      var q = THOUGHTS[thoughtI++ % THOUGHTS.length];
+      thoughtEl.innerHTML = "<p>“" + q[0] + "”</p><small>— " + q[1] + "</small>";
+      thoughtEl.classList.add("show");
+      thinking = true;
+      unlock("think");
+    } else if (!idle && thinking) {
+      thoughtEl.classList.remove("show");
+      thinking = false;
+    }
+  }
 
   function honk() {
     unlock("honk");
@@ -1214,6 +1279,7 @@
     regionGroups.forEach(function (g) { g.el.classList.toggle("off", cur < g.from || cur > g.to); });
     if (dx < -1.5 && cur > CP.school.x - 200 && cur < CP.school.x + 700) unlock("backwards");
     updateWeather(dt, dx, vw, vh);
+    updateThought(now, kmh);
 
     // Exhaust
     puffT -= dt;
