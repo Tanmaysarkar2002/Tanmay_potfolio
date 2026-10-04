@@ -4,90 +4,161 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tanmay Sarkar — The Ride</title>
-  <meta name="description" content="Tanmay Sarkar — Backend & Infrastructure Engineer (SDE III). Hop on the bike and ride through my journey: Python, Rust, Kubernetes, Kafka, AI security.">
+  <meta name="description" content="Tanmay Sarkar — Backend & Infrastructure Engineer (SDE III). Kick-start the bike and ride through my journey: Python, Rust, Kubernetes, Kafka, AI security.">
   <meta property="og:title" content="Tanmay Sarkar — The Ride">
-  <meta property="og:description" content="Scroll to pedal through my journey as a backend & infrastructure engineer.">
+  <meta property="og:description" content="A hand-drawn motorbike ride through my journey as a backend & infrastructure engineer.">
   <meta property="og:url" content="https://tanmaysarkar.dev/">
-  <meta name="theme-color" content="#1b1f3a">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#f4f1ea">
+  <link rel="preload" href="ride/fonts/cabin-sketch-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="ride/fonts/patrick-hand-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="ride/style.css">
 </head>
 <body>
+  <!-- Shared sketch defs -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4"/>
+        <feDisplacementMap in="SourceGraphic" scale="3"/>
+      </filter>
+      <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="7" stroke="#1f1f24" stroke-width="1.1" opacity=".55"/>
+      </pattern>
+      <pattern id="hatch-light" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">
+        <line x1="0" y1="0" x2="0" y2="10" stroke="#1f1f24" stroke-width="1" opacity=".28"/>
+      </pattern>
+      <pattern id="bricks" width="40" height="20" patternUnits="userSpaceOnUse">
+        <path d="M0 0.5 H40 M0 10.5 H40 M20 0 V10 M0 10 V20 M40 10 V20" stroke="#1f1f24" stroke-width="1" opacity=".35" fill="none"/>
+      </pattern>
+    </defs>
+  </svg>
+
   <!-- HUD -->
   <header class="hud">
-    <a class="brand" href="#" data-jump="0" aria-label="Back to start">TS<span>.dev</span></a>
+    <a class="brand" href="#" data-jump="0" aria-label="Back to the garage">TS<span>.dev</span></a>
     <nav class="route" aria-label="Journey checkpoints">
-      <div class="route-track"><div class="route-fill"></div></div>
-      <!-- dots injected by ride.js -->
+      <div class="route-track"></div><div class="route-fill"></div>
+      <div class="route-bike" aria-hidden="true"><svg viewBox="0 0 28 18" width="28" height="18"><circle cx="6" cy="13" r="4.5" fill="#fbfaf6" stroke="#1f1f24" stroke-width="2"/><circle cx="22" cy="13" r="4.5" fill="#fbfaf6" stroke="#1f1f24" stroke-width="2"/><path d="M6 13 L12 7 H18 L22 13 M17 4 L19 7" fill="none" stroke="#1f1f24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 7 Q14 3 18 6 Z" fill="#ff6b35" stroke="#1f1f24" stroke-width="1.5"/></svg></div>
     </nav>
-    <div class="hud-links">
-      <a href="https://github.com/Tanmaysarkar2002" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://drive.google.com/file/d/1gTwUldj4om09PPkzUUjL5wSXbaeYlcZ5/view?usp=sharing" target="_blank" rel="noopener" class="pill">Resume</a>
+    <div class="hud-buttons">
+      <button class="sq" id="sound-btn" aria-label="Toggle engine sound" title="Engine sound">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="wave" d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12" opacity=".25"/><path class="mute" d="M16 9l5 6M21 9l-5 6"/></svg>
+      </button>
+      <button class="sq" id="trophy-btn" aria-label="Achievements" title="Achievements">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8M9 17h6"/></svg>
+        <span class="badge" id="trophy-count">0</span>
+      </button>
+      <a class="sq" href="https://drive.google.com/file/d/1gTwUldj4om09PPkzUUjL5wSXbaeYlcZ5/view?usp=sharing" target="_blank" rel="noopener">Resume</a>
     </div>
   </header>
 
-  <div class="stage" aria-hidden="false">
-    <div class="sky" id="sky">
-      <div class="stars" id="stars"></div>
-      <div class="sun" id="sun"></div>
-      <div class="moon" id="moon"></div>
-    </div>
+  <aside class="panel" id="trophy-panel" aria-label="Achievements">
+    <h3>Achievements</h3>
+    <ul id="trophy-list"></ul>
+  </aside>
+
+  <div class="speedo" aria-hidden="true">
+    <svg viewBox="0 0 128 92">
+      <path d="M14 70 A52 52 0 1 1 114 70" fill="#fbfaf6" stroke="#1f1f24" stroke-width="2.5" stroke-linecap="round" filter="url(#rough)"/>
+      <g id="speedo-ticks" stroke="#1f1f24" stroke-width="2" stroke-linecap="round"></g>
+      <path d="M92 26 A52 52 0 0 1 114 70" fill="none" stroke="#ff6b35" stroke-width="5" opacity=".7"/>
+      <g class="needle" id="needle"><line x1="64" y1="64" x2="64" y2="22" stroke="#ff6b35" stroke-width="3.5" stroke-linecap="round"/></g>
+      <circle cx="64" cy="64" r="6" fill="#1f1f24"/>
+      <text x="64" y="86" text-anchor="middle" font-family="Patrick Hand" font-size="15" fill="#1f1f24"><tspan id="speed">0</tspan> km/h · <tspan id="gear">N</tspan></text>
+    </svg>
+  </div>
+
+  <div class="stage">
+    <div class="sky" id="sky"><div class="sky-wash" id="sky-wash"></div></div>
+    <div class="sun" id="sun"></div>
     <div class="layer" id="clouds" data-f="0.08"></div>
     <div class="layer" id="far" data-f="0.15"></div>
     <div class="layer" id="mid" data-f="0.35"></div>
     <div class="layer" id="near" data-f="0.6"></div>
     <div class="layer ground" id="ground" data-f="1">
-      <div class="grass"></div>
-      <div class="road"><div class="road-line"></div></div>
+      <div class="road"><div class="road-line"></div><div class="road-edge"></div></div>
+    </div>
+    <div class="night"></div>
+    <div class="stars" id="stars"></div>
+    <div class="moon" id="moon"></div>
+    <div class="layer" id="glow" data-f="1"></div>
+    <div class="paper-grain"></div>
+
+    <div class="doodles" id="doodles" aria-hidden="true">
+      <span style="left:14%;top:18%">✳</span>
+      <span style="left:22%;top:40%;animation-delay:-1s">○</span>
+      <span style="left:80%;top:22%;animation-delay:-2s">✈</span>
+      <span style="left:72%;top:46%;animation-delay:-.5s">☕</span>
+      <span style="left:88%;top:36%;animation-delay:-3s">✳</span>
+      <span style="left:9%;top:52%;animation-delay:-1.5s">{ }</span>
     </div>
 
-    <div class="rider" id="rider">
-      <svg viewBox="0 0 200 150" aria-hidden="true">
-        <g id="bike-far-leg"></g>
-        <g class="wheel" id="wheel-r" transform="translate(48 112)">
-          <circle r="34" class="tyre"/><circle r="29" class="rim"/>
-          <g class="spokes"></g><circle r="4" class="hub"/>
-        </g>
-        <g class="wheel" id="wheel-f" transform="translate(152 112)">
-          <circle r="34" class="tyre"/><circle r="29" class="rim"/>
-          <g class="spokes"></g><circle r="4" class="hub"/>
-        </g>
-        <g class="frame">
-          <path d="M48 112 L95 112 L80 62 Z M80 62 L140 64 L95 112 M140 64 L152 112 M140 64 L138 50 L150 48"/>
-          <path class="seat" d="M70 58 L90 58"/>
-        </g>
-        <g id="crank"></g>
-        <g id="body">
-          <path class="backpack" d="M72 22 q-14 4 -12 26 l14 2 z"/>
-          <path class="torso" d="M82 56 L112 30"/>
-          <path class="arm" d="M108 33 L128 44 L148 49"/>
-          <circle class="head" cx="121" cy="18" r="10"/>
-          <path class="helmet" d="M109 15 q6 -16 24 -6 q-2 4 -6 3 z"/>
-          <text x="91" y="45" class="jersey">&lt;/&gt;</text>
-        </g>
-        <g id="bike-near-leg"></g>
-      </svg>
-      <div class="speedo"><span id="speed">0</span><small>km/h</small></div>
-    </div>
-
-    <!-- Hero -->
     <section class="hero" id="hero">
-      <p class="eyebrow">Hi, I'm</p>
-      <h1>Tanmay Sarkar</h1>
-      <p class="role">SDE III · Backend &amp; Infrastructure Engineer</p>
-      <p class="tag">Python · Rust · Kubernetes · Kafka · AI-driven security</p>
-      <p class="hint"><span class="mouse"></span> Scroll to start pedalling</p>
+      <p class="eyebrow">hey, I'm</p>
+      <h1>Tanmay<span>.</span></h1>
+      <p class="role">&lt; <b>backend</b> &amp; <b>infra</b> engineer /&gt;</p>
     </section>
 
-    <!-- Checkpoint cards -->
+    <div class="beam" id="beam"></div>
+    <div class="speedlines" id="speedlines"><i style="top:10px;width:70px"></i><i style="top:34px;width:110px;animation-delay:-.12s"></i><i style="top:58px;width:60px;animation-delay:-.22s"></i><i style="top:80px;width:90px;animation-delay:-.05s"></i></div>
+    <div id="puffs"></div>
+
+    <div class="rider" id="rider" role="button" tabindex="0" aria-label="Honk the horn">
+      <svg viewBox="0 0 240 170" aria-hidden="true">
+        <g id="bike">
+          <!-- exhaust -->
+          <path class="ink" d="M104 132 L36 122 L22 118 L20 126 L36 130 L100 140 Z" fill="#d9d6ce"/>
+          <!-- rear wheel -->
+          <g transform="translate(58 132)">
+            <circle r="33" class="tyre"/>
+            <g id="wheel-r"><circle r="33" class="tread"/><circle r="22" fill="none" stroke="#1f1f24" stroke-width="1.6"/><g class="spokes"></g></g>
+            <circle r="5" fill="#1f1f24"/>
+          </g>
+          <!-- front wheel -->
+          <g transform="translate(194 132)">
+            <circle r="33" class="tyre"/>
+            <g id="wheel-f"><circle r="33" class="tread"/><circle r="22" fill="none" stroke="#1f1f24" stroke-width="1.6"/><g class="spokes"></g></g>
+            <circle r="5" fill="#1f1f24"/>
+          </g>
+          <!-- body -->
+          <path class="ink" d="M24 112 Q34 86 76 92" fill="none"/>
+          <path class="ink" d="M58 132 L114 124" fill="none" stroke-width="5"/>
+          <path class="ink" d="M114 124 L150 74 M100 100 L92 72" fill="none" stroke-width="4"/>
+          <rect class="ink" x="98" y="98" width="48" height="34" rx="6" fill="url(#hatch)"/>
+          <path class="ink" d="M104 104 V128 M112 104 V128 M120 104 V128 M128 104 V128 M136 104 V128" stroke-width="1.4" fill="none"/>
+          <path class="ink" d="M170 58 L194 132 M178 56 L200 126" fill="none" stroke-width="4"/>
+          <path class="ink" d="M174 112 Q194 90 216 106" fill="none"/>
+          <path class="ink" d="M56 78 L36 72 L40 86 Z" fill="#fbfaf6"/>
+          <circle cx="38" cy="78" r="3" fill="#e63946"/>
+          <path class="ink" d="M62 78 Q72 66 112 70 L110 80 L64 84 Z" fill="#1f1f24"/>
+          <path class="ink" d="M108 70 Q118 48 152 52 L166 68 Q144 80 110 78 Z" fill="#ff6b35"/>
+          <path d="M118 62 Q138 54 158 60" stroke="#fbfaf6" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle class="ink" cx="182" cy="66" r="10" fill="#fff6d8"/>
+          <circle cx="184" cy="66" r="4" fill="#ffd166"/>
+          <path class="ink" d="M164 44 L176 54 M160 44 L168 42" fill="none" stroke-width="3.5"/>
+          <!-- rider -->
+          <path class="scarf" d="M136 34 C118 30 104 38 86 30 C96 40 112 40 124 42 Z" fill="#ff6b35" stroke="#1f1f24" stroke-width="1.8" stroke-linejoin="round"/>
+          <path class="ink" d="M98 70 L136 88 L122 120" fill="none" stroke-width="12" stroke="#1f1f24"/>
+          <path class="ink" d="M98 70 L136 88 L122 120" fill="none" stroke-width="7" stroke="#3a4a6b"/>
+          <path class="ink" d="M114 120 L132 122 L130 128 L112 127 Z" fill="#1f1f24"/>
+          <path class="ink" d="M84 70 L100 48 L138 26 L152 40 L114 74 Z" fill="#2f3a55"/>
+          <path class="ink" d="M86 52 L96 34 L114 42 L104 60 Z" fill="#c8a46a"/>
+          <text x="112" y="56" font-family="Patrick Hand" font-size="12" fill="#fbfaf6" transform="rotate(-32 112 56)">&lt;/&gt;</text>
+          <path class="ink" d="M140 32 L156 54 L170 46" fill="none" stroke-width="7" stroke="#2f3a55"/>
+          <circle class="ink" cx="152" cy="18" r="15" fill="#fbfaf6"/>
+          <path d="M140 12 Q152 2 166 12" stroke="#ff6b35" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path class="ink" d="M154 16 Q166 14 168 24 L156 26 Z" fill="#1f1f24"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Checkpoint notes -->
     <div class="cards">
       <article class="card" data-cp="school">
         <p class="when">2019 – 2020 · Malda, West Bengal</p>
         <h2>Kendriya Vidyalaya Malda</h2>
         <p class="sub">Higher Secondary · PCM + Computer Science</p>
-        <p>The start line. Physics, Chemistry, Maths, and Computer Science, the subject that set the direction for everything after.</p>
+        <p>First gear. Physics, Chemistry, Maths, and Computer Science, the subject that set the direction for everything after.</p>
         <div class="chips"><span>CBSE</span><span>PCM + CS</span></div>
       </article>
 
@@ -95,8 +166,8 @@
         <p class="when">2020 – 2024 · Gwalior</p>
         <h2>Rustamji Institute of Technology</h2>
         <p class="sub">B.Tech, Electronics &amp; Communication Engineering</p>
-        <p>Studied electronics by day and wrote backend code by night. I started my first industry role before graduating.</p>
-        <div class="stats"><div><b>8.1</b><span>GPA / 10</span></div><div><b>4</b><span>years</span></div></div>
+        <p>Studied electronics in class and wrote backend code after hours. I started my first industry role before graduating.</p>
+        <div class="stats"><div><b>8.1</b><span>GPA / 10</span></div><div><b>4 yrs</b><span>of circuits &amp; code</span></div></div>
       </article>
 
       <article class="card" data-cp="solytics">
@@ -136,39 +207,23 @@
       </article>
 
       <article class="card" data-cp="garage">
-        <p class="when">Pit stop · The toolbox</p>
-        <h2>What's in the saddle bag</h2>
+        <p class="when">Pit stop · Refuel</p>
+        <h2>What's in the toolbox</h2>
         <div class="skillset"><h3>Languages</h3><div class="chips"><span>Python</span><span>Rust</span><span>C++</span><span>SQL</span></div></div>
         <div class="skillset"><h3>Backend</h3><div class="chips"><span>Django</span><span>DRF</span><span>FastAPI</span><span>Flask</span><span>Celery</span><span>Kafka</span><span>RabbitMQ</span></div></div>
         <div class="skillset"><h3>Cloud &amp; DevOps</h3><div class="chips"><span>AWS</span><span>GCP</span><span>Docker</span><span>Kubernetes</span><span>CI/CD</span><span>Nginx</span><span>Linux</span></div></div>
         <div class="skillset"><h3>Data &amp; AI</h3><div class="chips"><span>PostgreSQL</span><span>MySQL</span><span>Elasticsearch</span><span>Redis</span><span>LangChain</span><span>Hugging Face</span><span>Scrapy</span><span>Playwright</span><span>Airflow</span><span>Grafana</span></div></div>
       </article>
 
-      <article class="card wide" data-cp="projects">
-        <p class="when">Side roads · Projects</p>
-        <h2>Things I built on the way</h2>
-        <div class="projects">
-          <a class="project" href="https://github.com/Tanmaysarkar2002" target="_blank" rel="noopener">
-            <h3>Sentinel</h3>
-            <p>Plugin-based infrastructure monitoring in Rust (Axum + SQLx). Feature-flagged plugins, React dashboard, and alerts to Slack and Kafka.</p>
-            <div class="chips"><span>Rust</span><span>Axum</span><span>React</span><span>Docker</span></div>
-          </a>
-          <a class="project" href="https://github.com/Tanmaysarkar2002/Universal-Scrapper" target="_blank" rel="noopener">
-            <h3>Data Harvester</h3>
-            <p>Universal web scraper with CAPTCHA solving, Google News, and RSS aggregation. Runs on AWS EC2 with Postgres and Redis.</p>
-            <div class="chips"><span>Django REST</span><span>React</span><span>AWS</span></div>
-          </a>
-          <a class="project" href="https://github.com/Tanmaysarkar2002/Linked__scraping__Database" target="_blank" rel="noopener">
-            <h3>LinkedIn Jobs Intelligence</h3>
-            <p>Scrapes and indexes LinkedIn listings, with filtering based on criteria you set.</p>
-            <div class="chips"><span>Selenium</span><span>PostgreSQL</span></div>
-          </a>
-        </div>
+      <article class="card mini" data-cp="projects">
+        <p class="when">Side quest · Projects</p>
+        <h2>The washing line</h2>
+        <p>Projects I built along the way are pegged up above the road. Click a poster to open its code.</p>
       </article>
 
-      <article class="card finish" data-cp="finish">
-        <p class="when">Finish line · 2026 and still riding</p>
-        <h2>Let's ride together</h2>
+      <article class="card" data-cp="finish">
+        <p class="when">Chai stop · 2026 and still riding</p>
+        <h2>Let's grab a chai ☕</h2>
         <p>I'm open to backend, platform, and AI-infrastructure roles. If you're building something hard, I'd like to hear about it.</p>
         <div class="cta">
           <a class="btn primary" href="mailto:tanmaysarkar959@gmail.com">tanmaysarkar959@gmail.com</a>
@@ -176,14 +231,19 @@
           <a class="btn" href="https://github.com/Tanmaysarkar2002" target="_blank" rel="noopener">GitHub</a>
           <a class="btn" href="https://drive.google.com/file/d/1gTwUldj4om09PPkzUUjL5wSXbaeYlcZ5/view?usp=sharing" target="_blank" rel="noopener">Resume</a>
         </div>
-        <button class="again" data-jump="0">↺ Ride again</button>
+        <button class="again" data-jump="0">↺ ride again</button>
       </article>
     </div>
   </div>
 
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="box" id="toast-box"></div>
+    <div><h4 id="toast-title">RIDER</h4><p id="toast-text"></p></div>
+  </div>
+
   <div class="scroll-space" id="scroll-space"></div>
 
-  <noscript><style>.stage{position:static;height:auto}.cards .card{position:static;opacity:1;transform:none;margin:16px auto}.rider,.hero .hint{display:none}</style></noscript>
+  <noscript><style>.stage{position:static;height:auto}.cards{position:static}.cards .card{position:relative;inset:auto;opacity:1;transform:none;margin:24px auto;max-height:none}.rider,.speedo,.toast{display:none}</style></noscript>
   <script src="ride/ride.js"></script>
 </body>
 </html>
