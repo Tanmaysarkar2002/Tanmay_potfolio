@@ -13,10 +13,13 @@
     { id: "solytics",  x: 4900,  label: "Pune",     stone: ["PUNE", "2023"] },
     { id: "izoologic", x: 6800,  label: "Jaipur",   stone: ["JAIPUR", "2024"] },
     { id: "garage",    x: 8600,  label: "Pit stop", stone: ["FUEL", "0 km"] },
-    { id: "projects",  x: 10200, label: "Projects", stone: ["SIDE", "QUEST"] },
-    { id: "finish",    x: 12000, label: "Chai",     stone: ["CHAI", "2026"] }
+    { id: "ladakh",    x: 10000, label: "Ladakh",   stone: ["LADAKH", "SOLO"] },
+    { id: "projects",  x: 11800, label: "Projects", stone: ["SIDE", "QUEST"] },
+    { id: "finish",    x: 13600, label: "Chai",     stone: ["CHAI", "2026"] }
   ];
-  var END = 12000;
+  var CP = {};
+  CHECKPOINTS.forEach(function (c) { CP[c.id] = c; });
+  var END = 13600;
   var OFFSET = 1500;           // world x = -OFFSET is the left edge of each layer
   var SCROLL_PER_PX = 0.85;    // page scroll px per world px
 
@@ -32,7 +35,13 @@
     ["poster",    "CURIOUS",      "Opened a project poster"],
     ["speed",     "SPEED DEMON",  "Hit 60 km/h"],
     ["night",     "NIGHT RIDER",  "Rode after sunset"],
-    ["finish",    "CHAI TIME",    "Made it to the chai stop"]
+    ["ladakh",    "HIGH ALTITUDE", "Rode up to Ladakh"],
+    ["finish",    "CHAI TIME",    "Made it to the chai stop"],
+    // Hidden easter eggs (4th field = hidden until found).
+    ["cow",       "COW WHISPERER", "Honked at the cow", true],
+    ["backwards", "BACK TO SCHOOL", "Rode backwards past the school", true],
+    ["sudo",      "ROOT ACCESS",   "Typed sudo ride", true],
+    ["moon",      "MOONLIGHTER",   "Clicked the moon", true]
   ];
 
   // Sky wash + night amount along the journey.
@@ -126,7 +135,7 @@
 
   // Rough region of the journey for a given world x — scenery changes with it.
   function region(wx) {
-    return wx < 2300 ? "bengal" : wx < 4000 ? "gwalior" : wx < 5900 ? "pune" : wx < 7700 ? "jaipur" : wx < 9500 ? "highway" : "city";
+    return wx < 2300 ? "bengal" : wx < 4000 ? "gwalior" : wx < 5900 ? "pune" : wx < 7700 ? "jaipur" : wx < 9300 ? "highway" : wx < 11000 ? "ladakh" : "city";
   }
   // Layer coordinate -> the world x the rider is at when it passes mid-screen.
   function worldAt(u, f) { return (u - 520) / f - OFFSET + 190; }
@@ -179,13 +188,22 @@
     $("#clouds").innerHTML = svg(w, 300, s, true, balloons);
   }
 
-  var HEIGHTS_FAR = { bengal: 100, gwalior: 180, pune: 300, jaipur: 140, highway: 170, city: 160 };
-  var HEIGHTS_MID = { bengal: 40, gwalior: 100, pune: 180, jaipur: 70, highway: 80, city: 60 };
+  var HEIGHTS_FAR = { bengal: 100, gwalior: 180, pune: 300, jaipur: 140, highway: 170, ladakh: 350, city: 160 };
+  var HEIGHTS_MID = { bengal: 40, gwalior: 100, pune: 180, jaipur: 70, highway: 80, ladakh: 120, city: 60 };
 
   function buildFar() {
     var f = 0.15, w = layerWidth(f);
     var rd = smoothRidge(w, 380, 60, f, function (wx) { return HEIGHTS_FAR[region(wx)]; }, 40, 11);
-    $("#far").innerHTML = svg(w, 380, ridgeArt(rd, PAPER, "hatch-light"));
+    var snow = "";
+    for (var i = 1; i < rd.pts.length - 1; i++) {
+      var pt = rd.pts[i];
+      if (region(worldAt(pt[0], f)) !== "ladakh" || pt[1] > 120) continue;
+      if (pt[1] > rd.pts[i - 1][1] || pt[1] > rd.pts[i + 1][1]) continue; // peaks only
+      var x = pt[0], y = pt[1] + 3;
+      snow += '<path d="M' + (x - 34) + " " + (y + 30) + " Q" + (x - 14) + " " + (y + 4) + " " + x + " " + y + " Q" + (x + 14) + " " + (y + 4) + " " + (x + 34) + " " + (y + 30) +
+        " l-9 -7 l-8 8 l-9 -9 l-8 9 l-9 -9 l-8 8 l-9 -7 z" + '" fill="#fff" stroke="' + INK + '" stroke-width="1.4" stroke-linejoin="round"/>';
+    }
+    $("#far").innerHTML = svg(w, 380, ridgeArt(rd, PAPER, "hatch-light") + snow);
   }
 
   // --- mid-layer set pieces -------------------------------------------------
@@ -254,6 +272,25 @@
       '<path d="M' + x + " " + top + " v34 M" + (x - 14) + " " + (top + 16) + " h28" + '" stroke="' + INK + '" stroke-width="1"/>' +
       '<path d="M' + x + " " + (top + 34) + " q6 8 0 14 q-6 6 2 12" + '" stroke="' + INK + '" stroke-width="1.4" fill="none"/></g>';
   }
+  function snowPeak(x, b, w, h) {
+    var d = "M" + x + " " + b + " L" + (x + w / 2) + " " + (b - h) + " L" + (x + w) + " " + b + " Z";
+    var cx = x + w / 2, sy = b - h, cw = w * 0.17, ch = h * 0.28;
+    return '<path d="' + d + '" fill="#eef0f4" ' + S + '/><path d="M' + cx + " " + sy + " L" + (x + w) + " " + b + " H" + cx + ' Z" fill="url(#hatch-light)"/>' +
+      '<path d="M' + (cx - cw) + " " + (sy + ch) + " L" + cx + " " + sy + " L" + (cx + cw) + " " + (sy + ch) + " l-" + cw / 3 + " -7 l-" + cw / 3 + " 9 l-" + cw / 3 + " -6 l-" + cw / 3 + " 8 l-" + cw / 3 + " -9 z" + '" fill="#fff" ' + S + ' stroke-width="1.8"/>';
+  }
+  function stupa(x, b) {
+    return '<path d="M' + (x - 22) + " " + b + " h44 v-10 h-44 z M" + (x - 16) + " " + (b - 10) + " q16 -30 32 0 z M" + (x - 5) + " " + (b - 25) + " h10 v-6 h-10 z M" + x + " " + (b - 31) + ' v-16" fill="#fff" ' + S + ' stroke-width="1.8"/>' +
+      '<circle cx="' + x + '" cy="' + (b - 49) + '" r="2.5" fill="#e6c35c"/>';
+  }
+  function prayerFlags(x0, y0, x1, y1) {
+    var cols = ["#3a86ff", "#fbfaf6", "#e63946", "#2a9d8f", "#ffd166"], s = "", n = 11, mx = (x0 + x1) / 2, my = Math.max(y0, y1) + 26;
+    s += '<path d="M' + x0 + " " + y0 + " Q" + mx + " " + my + " " + x1 + " " + y1 + '" stroke="' + INK + '" stroke-width="1.2" fill="none"/>';
+    for (var i = 1; i < n; i++) {
+      var t = i / n, px = (1 - t) * (1 - t) * x0 + 2 * t * (1 - t) * mx + t * t * x1, py = (1 - t) * (1 - t) * y0 + 2 * t * (1 - t) * my + t * t * y1;
+      s += '<rect class="flag" x="' + (px - 7).toFixed(1) + '" y="' + py.toFixed(1) + '" width="14" height="17" fill="' + cols[i % 5] + '" stroke="' + INK + '" stroke-width="1.2" style="animation-delay:-' + (i * 0.23).toFixed(2) + 's"/>';
+    }
+    return s;
+  }
   function dunes(x0, x1, b) {
     var s = "";
     for (var x = x0; x < x1; x += 140) s += '<path d="M' + x + " " + b + " q60 -34 120 -6 q20 6 40 6" + '" stroke="' + INK + '" stroke-width="1.4" fill="#f6e3c3"/>';
@@ -272,26 +309,43 @@
     for (var px = uAt(-600, f, 200); px < uAt(2000, f, 400); px += 9) art += '<path d="M' + px + " " + (ridgeY(rd, px) + 10) + ' l2 -7 l2 7" stroke="#7aa35b" stroke-width="1.2" fill="none"/>';
     // Gwalior: ravine mesas + the fort.
     art += mesa(uAt(2300, f, 1500), H, 190, 56) + mesa(uAt(2900, f, 1700), H, 150, 44);
-    art += fort(uAt(CHECKPOINTS[2].x, f, 820), ridgeY(rd, uAt(CHECKPOINTS[2].x, f, 880)) - 84, 1);
+    art += fort(uAt(CP.college.x, f, 820), ridgeY(rd, uAt(CP.college.x, f, 880)) - 84, 1);
     // Pune: Western Ghats waterfall, then rooftops.
     var wfx = uAt(4300, f, 1300), wtop = ridgeY(rd, wfx + 14);
     art += waterfall(wfx, wtop, H);
-    art += waterTanks(uAt(CHECKPOINTS[3].x, f, 900), 5, H);
+    art += waterTanks(uAt(CP.solytics.x, f, 900), 5, H);
     // Jaipur: dunes, Amber fort, kites.
     art += dunes(uAt(5900, f, 1450), uAt(7400, f, 1450), H);
-    art += fort(uAt(CHECKPOINTS[4].x, f, 1100), ridgeY(rd, uAt(CHECKPOINTS[4].x, f, 1160)) - 70, 0.8);
-    [["#e63946", 5900, 1500, 20], ["#ffd166", 6200, 1600, 46], ["#3a86ff", 6600, 1500, 10], ["#2a9d8f", 7000, 1600, 34], ["#ff6b35", 9900, 1500, 24], ["#e63946", 10300, 1600, 8]].forEach(function (k, i) {
-      var kx = uAt(k[1], f, k[2]);
-      live += kite(kx, k[3], H - 60, k[0], (i * 0.7).toFixed(1));
+    art += fort(uAt(CP.izoologic.x, f, 1100), ridgeY(rd, uAt(CP.izoologic.x, f, 1160)) - 70, 0.8);
+    // Region-only pieces live in groups that fade in/out with the rider's position (see frame()).
+    var rg = function (from, to, inner) { return '<g class="rg" data-from="' + from + '" data-to="' + to + '">' + inner + "</g>"; };
+    var kitesJ = "", kitesC = "";
+    [["#e63946", 5900, 1500, 20], ["#ffd166", 6200, 1600, 46], ["#3a86ff", 6600, 1500, 10], ["#2a9d8f", 7000, 1600, 34]].forEach(function (k, i) {
+      kitesJ += kite(uAt(k[1], f, k[2]), k[3], H - 60, k[0], (i * 0.7).toFixed(1));
     });
+    [["#ff6b35", 11400, 1500, 24], ["#e63946", 11800, 1600, 8]].forEach(function (k, i) {
+      kitesC += kite(uAt(k[1], f, k[2]), k[3], H - 60, k[0], (i * 0.7).toFixed(1));
+    });
+    live += rg(5600, 7900, kitesJ) + rg(11000, 99999, kitesC);
     // Highway: wind farm + a painted truck.
+    var farm = "";
     [[7700, 1500, 0.9, 5], [7900, 1700, 1.1, 6.5], [8500, 1550, 0.8, 4.2], [8900, 1700, 1, 5.6]].forEach(function (m) {
       var mx = uAt(m[0], f, m[1]), wm = windmill(mx, ridgeY(rd, mx) + 4, m[2], m[3]);
-      art += wm.art; live += wm.live;
+      farm += wm.art + wm.live;
     });
-    art += truck(uAt(8700, f, 1500), H);
+    live += rg(7500, 9500, farm + truck(uAt(8700, f, 1500), H));
+    // Ladakh: snow peaks, a turquoise lake, stupas and prayer flags.
+    [[9300, 1450, 260, 190], [9550, 1650, 220, 150], [9900, 1500, 300, 210], [10300, 1600, 240, 170]].forEach(function (m) {
+      art += snowPeak(uAt(m[0], f, m[1]), H, m[2], m[3]);
+    });
+    var l0 = uAt(9500, f, 1300), l1 = uAt(10700, f, 1500);
+    art += '<path d="M' + l0 + " " + (H - 4) + " Q" + (l0 + 40) + " " + (H - 26) + " " + (l0 + 140) + " " + (H - 24) + " H" + (l1 - 140) + " Q" + (l1 - 40) + " " + (H - 26) + " " + l1 + " " + (H - 4) + ' Z" fill="#7fd1d8" stroke="' + INK + '" stroke-width="1.8"/>';
+    for (var lx2 = l0 + 60; lx2 < l1 - 60; lx2 += 70) art += '<path d="M' + lx2 + " " + (H - 14) + ' h18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+    art += stupa(uAt(9700, f, 1500), H - 22) + stupa(uAt(10400, f, 1550), H - 20);
+    live += rg(9100, 11300, prayerFlags(uAt(9450, f, 1450), H - 120, uAt(9450, f, 1450) + 260, H - 60) + prayerFlags(uAt(10100, f, 1500), H - 110, uAt(10100, f, 1500) + 220, H - 70));
+
     // City rooftops behind the washing line.
-    art += waterTanks(uAt(CHECKPOINTS[6].x, f, 1000), 9, H);
+    art += waterTanks(uAt(CP.projects.x, f, 1000), 9, H);
     $("#mid").innerHTML = svg(w, H, art, true, live);
   }
 
@@ -355,6 +409,20 @@
       '<path d="M26 44 Q10 34 10 20 L2 18 Q0 10 8 10 L16 12 Q20 30 32 40" fill="#e8c99a" ' + S + "/>" +
       '<circle cx="7" cy="14" r="1.3" fill="' + INK + '"/><path d="M80 40 q6 6 3 14" ' + S + ' stroke-width="1.6" fill="none"/></g>';
   }
+  function yak(x, b) {
+    return '<g transform="translate(' + x + " " + (b - 70) + ')">' +
+      '<path d="M18 46 L16 70 M28 48 L30 70 M62 48 L60 70 M72 46 L75 70" ' + S + ' stroke-width="3.2" fill="none"/>' +
+      '<path d="M10 30 Q14 8 44 10 Q74 8 82 26 Q86 44 76 52 L70 48 L64 54 L56 48 L48 54 L40 48 L32 54 L24 48 L16 54 Q8 46 10 30 Z" fill="#5a4636" ' + S + "/>" +
+      '<path d="M12 28 Q0 26 -2 38 Q4 46 12 42 Z" fill="#5a4636" ' + S + ' stroke-width="2"/>' +
+      '<path d="M4 26 q-6 -10 2 -16 M12 24 q2 -12 12 -12" stroke="#efe9dc" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="2" cy="33" r="1.4" fill="#fff"/><path d="M84 30 q8 4 6 16" ' + S + ' stroke-width="2" fill="none"/></g>';
+  }
+  function maniStones(x, b, k) {
+    return '<ellipse cx="' + x + '" cy="' + (b - 6 * k) + '" rx="' + 18 * k + '" ry="' + 7 * k + '" fill="#efe9dc" ' + S + ' stroke-width="1.8"/>' +
+      '<ellipse cx="' + (x + 2 * k) + '" cy="' + (b - 16 * k) + '" rx="' + 13 * k + '" ry="' + 6 * k + '" fill="#f6f3ea" ' + S + ' stroke-width="1.8"/>' +
+      '<ellipse cx="' + x + '" cy="' + (b - 25 * k) + '" rx="' + 8 * k + '" ry="' + 4.5 * k + '" fill="#efe9dc" ' + S + ' stroke-width="1.8"/>' +
+      '<text x="' + (x - 7 * k) + '" y="' + (b - 3 * k) + '" font-size="' + 7 * k + '" fill="#2a9d8f">ॐ</text>';
+  }
   function haystack(x, b, k) {
     var d = "M" + x + " " + b + " q" + 4 * k + " " + -46 * k + " " + 26 * k + " " + -48 * k + " q" + 22 * k + " " + 2 * k + " " + 26 * k + " " + 48 * k + " z";
     return '<path d="' + d + '" fill="#f3dc9b" ' + S + ' stroke-width="2"/><path d="' + d + '" fill="url(#hatch-light)"/>' +
@@ -394,7 +462,7 @@
       poles += '<path d="' + d + '" stroke="' + INK + '" stroke-width="1.2" fill="none" opacity=".75"/>';
     });
     // Region flora.
-    var camelDone = false, truckDone = false;
+    var camelDone = false, yakDone = false;
     for (x = 20; x < w; x += 90 + r() * 170) {
       var reg = region(worldAt(x, f)), k = 0.95 + r() * 0.5, roll = r();
       if (reg === "bengal") art += roll < 0.4 ? mango(x, b, k) : roll < 0.65 ? banana(x, b, k) : roll < 0.85 ? palm(x, b, k) : bush(x, b, k);
@@ -403,6 +471,10 @@
       else if (reg === "jaipur") {
         if (!camelDone && worldAt(x, f) > 6100) { art += camel(x, b); camelDone = true; x += 60; }
         else art += roll < 0.4 ? acacia(x, b, k * 0.8) : roll < 0.7 ? rock(x, b, k * 0.8) : bush(x, b, k * 0.7, "#efe2c4");
+      }
+      else if (reg === "ladakh") {
+        if (!yakDone && worldAt(x, f) > 9700) { art += yak(x, b); yakDone = true; x += 60; }
+        else art += roll < 0.45 ? rock(x, b, k) : roll < 0.75 ? maniStones(x, b, k) : bush(x, b, k * 0.6, "#efe9dc");
       }
       else if (reg === "highway") art += roll < 0.4 ? haystack(x, b, k) : roll < 0.75 ? roundTree(x, b, k) : bush(x, b, k);
       else art += roll < 0.6 ? house(x, b, k, ["#f6dccb", "#dfe9f5", "#f3e6c4", "#e3f0d9", "#f2d0e0"][Math.floor(r() * 5)]) : roundTree(x, b, k);
@@ -644,6 +716,24 @@
   }
   var COW_X = 4150;
 
+  function khardungLa() {
+    var art = '<path d="M40 300 V28 M200 300 V28" ' + S + ' stroke-width="6"/>' +
+      '<rect x="20" y="70" width="200" height="96" rx="6" fill="#ffd60a" ' + S + ' stroke-width="3"/>' +
+      '<rect x="28" y="78" width="184" height="80" rx="4" fill="none" stroke="' + INK + '" stroke-width="1.6"/>' +
+      '<text x="120" y="106" text-anchor="middle" ' + SKETCH + ' font-size="24" fill="' + INK + '">KHARDUNG LA</text>' +
+      '<text x="120" y="128" text-anchor="middle" ' + HAND + ' font-size="15" fill="' + INK + '">LADAKH · TOP OF THE PASS</text>' +
+      '<text x="120" y="150" text-anchor="middle" ' + SKETCH + ' font-size="18" fill="#c1121f">JULLEY!</text>' +
+      // solo camp: tent + campfire logs
+      '<path d="M300 300 L370 196 L440 300 Z" fill="#ff8c42" ' + S + '/><path d="M370 196 L392 300 H350 Z" fill="#c8551e" ' + S + ' stroke-width="2"/>' +
+      '<path d="M370 196 V184 l14 5 l-14 5" fill="#e63946" stroke="' + INK + '" stroke-width="1.4"/>' +
+      '<path d="M470 298 l40 -12 M472 286 l38 12" ' + S + ' stroke-width="6"/>' +
+      '<ellipse cx="490" cy="300" rx="34" ry="6" fill="#efe9dc" ' + S + ' stroke-width="1.6"/>';
+    var live = '<g class="fire"><path d="M490 288 q-14 -14 -4 -34 q2 14 10 10 q-4 -14 8 -26 q2 20 10 28 q8 12 -6 22 z" fill="#ffb627" stroke="' + INK + '" stroke-width="1.6"/>' +
+      '<path d="M492 286 q-6 -8 0 -18 q4 8 8 6 q2 8 -4 12 z" fill="#e63946"/></g>';
+    var flags = prayerFlags(40, 30, 200, 30) + prayerFlags(200, 32, 370, 186);
+    return svg(540, 300, art, true, live + flags);
+  }
+
   function chaiStall() {
     var stripes = "";
     for (var i = 0; i < 10; i++) stripes += '<path d="M' + (i * 32) + " 40 h32 v42 a16 12 0 0 1 -32 0 z" + '" fill="' + (i % 2 ? PAPER : ACCENT) + '" ' + S + ' stroke-width="2"/>';
@@ -689,14 +779,15 @@
 
   var LANDMARKS = [
     [-200, garage()],
-    [CHECKPOINTS[1].x + 330, school()],
-    [CHECKPOINTS[2].x + 320, college()],
-    [CHECKPOINTS[3].x + 330, pune()],
-    [CHECKPOINTS[4].x + 300, jaipur()],
-    [CHECKPOINTS[5].x + 320, pitstop()],
-    [CHECKPOINTS[6].x + 120, washingLine(), "line"],
+    [CP.school.x + 330, school()],
+    [CP.college.x + 320, college()],
+    [CP.solytics.x + 330, pune()],
+    [CP.izoologic.x + 300, jaipur()],
+    [CP.garage.x + 320, pitstop()],
+    [CP.ladakh.x + 300, khardungLa(), "ladakh"],
+    [CP.projects.x + 120, washingLine(), "line"],
     [COW_X, cow() + '<div class="bubble">moo!</div>', "cow"],
-    [CHECKPOINTS[5].x + 820, sleepyDog(), "dog"],
+    [CP.garage.x + 820, sleepyDog(), "dog"],
     [END + 200, chaiStall(), "chai"]
   ];
   var CHAI_X = END + 200;
@@ -858,7 +949,8 @@
     var n = 0;
     $("#trophy-list").innerHTML = ACHIEVEMENTS.map(function (a) {
       var ok = !!got[a[0]]; if (ok) n++;
-      return '<li class="' + (ok ? "" : "locked") + '"><span class="box">' + (ok ? "✓" : "") + "</span><div><b>" + (ok ? a[1] : "???") + "</b><small>" + a[2] + "</small></div></li>";
+      var secret = a[3] && !ok;
+      return '<li class="' + (ok ? "" : "locked") + '"><span class="box">' + (ok ? "✓" : "") + "</span><div><b>" + (ok ? a[1] : "???") + "</b><small>" + (secret ? "Hidden easter egg" : a[2]) + "</small></div></li>";
     }).join("");
     $("#trophy-count").textContent = n + "/" + ACHIEVEMENTS.length;
   }
@@ -887,6 +979,12 @@
 
   function honk() {
     unlock("honk");
+    if (cowBubble && cowBubble.classList.contains("show")) {
+      unlock("cow");
+      cowBubble.textContent = "MOOOO!";
+      setTimeout(function () { cowBubble.textContent = "moo!"; }, 1600);
+      blip([[180, 120]], 0.7, "sawtooth", 0.05);
+    }
     blip([[392], [494]], 0.45, "square", 0.08);
     var b = document.createElement("div");
     b.textContent = "beep beep!";
@@ -917,6 +1015,65 @@
       var s = 0.6 + (1 - p.life) * 1.8;
       p.el.style.transform = "translate(" + p.x.toFixed(1) + "px," + p.y.toFixed(1) + "px) scale(" + s.toFixed(2) + ")";
       p.el.style.opacity = Math.max(0, p.life * 0.8).toFixed(2);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // Weather: monsoon rain in Pune, dust in Jaipur, snow in Ladakh
+  // ------------------------------------------------------------------
+  var wCanvas = $("#weather"), wctx = wCanvas.getContext("2d"), haze = $("#haze"), roadH = 100, dpr = 1;
+  var drops = [], flakes = [], dust = [], splashes = [];
+  function sizeWeather() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    wCanvas.width = Math.round(window.innerWidth * dpr); wCanvas.height = Math.round(window.innerHeight * dpr);
+    roadH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--road-h")) || 100;
+  }
+  function band(a, b, edge) { return Math.max(0, Math.min(1, (cur - a) / edge, (b - cur) / edge)); }
+  function fillPool(arr, target, make) {
+    while (arr.length < target) arr.push(make(true));
+    if (arr.length > target) arr.length = Math.max(0, target);
+  }
+  function updateWeather(dt, dx, vw, vh) {
+    var rain = band(4100, 5800, 300), sand = band(6000, 7600, 300), snow = band(9300, 10900, 300);
+    haze.style.background = rain > 0 ? "rgba(70, 90, 120," + (rain * 0.16).toFixed(3) + ")" : sand > 0 ? "rgba(240, 170, 90," + (sand * 0.14).toFixed(3) + ")" : "transparent";
+    wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    wctx.clearRect(0, 0, vw, vh);
+    if (reduceMotion || (rain + sand + snow) === 0) { drops.length = flakes.length = dust.length = splashes.length = 0; return; }
+    var ground = vh - roadH + 26;
+    fillPool(drops, Math.round(rain * 170), function () { return { x: Math.random() * (vw + 200), y: Math.random() * vh, l: 12 + Math.random() * 14, v: 700 + Math.random() * 300 }; });
+    fillPool(flakes, Math.round(snow * 110), function () { return { x: Math.random() * (vw + 200), y: Math.random() * vh, r: 1.6 + Math.random() * 2.6, v: 30 + Math.random() * 50, p: Math.random() * 6 }; });
+    fillPool(dust, Math.round(sand * 80), function () { return { x: Math.random() * vw, y: vh * 0.45 + Math.random() * vh * 0.5, r: 1 + Math.random() * 2, v: 80 + Math.random() * 120 }; });
+    wctx.lineCap = "round";
+    wctx.strokeStyle = "rgba(31, 31, 36, .42)"; wctx.lineWidth = 1.4;
+    wctx.beginPath();
+    drops.forEach(function (d) {
+      d.y += d.v * dt; d.x += -d.v * 0.22 * dt - dx;
+      if (d.y > ground) { if (Math.random() < 0.35) splashes.push({ x: d.x, y: ground + Math.random() * 40, t: 0 }); d.y = -20; d.x = Math.random() * (vw + 200); }
+      if (d.x < -20) d.x += vw + 200;
+      wctx.moveTo(d.x, d.y); wctx.lineTo(d.x - d.l * 0.22, d.y + d.l);
+    });
+    wctx.stroke();
+    wctx.strokeStyle = "rgba(31, 31, 36, .5)"; wctx.lineWidth = 1.2;
+    splashes = splashes.filter(function (sp) {
+      sp.t += dt; sp.x -= dx;
+      var r = 3 + sp.t * 30;
+      wctx.globalAlpha = Math.max(0, 1 - sp.t / 0.3);
+      wctx.beginPath(); wctx.ellipse(sp.x, sp.y, r, r * 0.3, 0, Math.PI, 2 * Math.PI); wctx.stroke();
+      return sp.t < 0.3;
+    });
+    wctx.globalAlpha = 1;
+    wctx.fillStyle = "#fff"; wctx.strokeStyle = "rgba(31, 31, 36, .45)"; wctx.lineWidth = 1;
+    flakes.forEach(function (f) {
+      f.p += dt * 2; f.y += f.v * dt; f.x += Math.sin(f.p) * 20 * dt - dx;
+      if (f.y > ground + 30) { f.y = -10; f.x = Math.random() * (vw + 200); }
+      if (f.x < -20) f.x += vw + 200;
+      wctx.beginPath(); wctx.arc(f.x, f.y, f.r, 0, Math.PI * 2); wctx.fill(); wctx.stroke();
+    });
+    wctx.fillStyle = "rgba(200, 160, 100, .6)";
+    dust.forEach(function (p) {
+      p.x -= p.v * dt + dx; p.y += Math.sin(p.x / 40) * 0.4;
+      if (p.x < -10) { p.x = vw + Math.random() * 60; p.y = vh * 0.45 + Math.random() * vh * 0.5; }
+      wctx.fillRect(p.x, p.y, p.r * 2.4, p.r);
     });
   }
 
@@ -956,11 +1113,20 @@
   });
 
   // Throttle with W / ↑ / → / Space, brake with S / ↓ / ←. Shift = boost.
+  var typed = "", turboUntil = 0;
   var throttle = 0, boost = false, throttleVel = 0, introOpen = !!document.getElementById("intro");
   var FWD = { w: 1, arrowup: 1, arrowright: 1, d: 1, " ": 1 }, BACK = { s: 1, arrowdown: 1, arrowleft: 1, a: 1 };
   window.addEventListener("keydown", function (e) {
     if (introOpen) return;
     var k = e.key.toLowerCase(), tag = (e.target.tagName || "").toLowerCase();
+    if (k.length === 1) {
+      typed = (typed + k).slice(-9);
+      if (typed === "sudo ride") {
+        unlock("sudo");
+        turboUntil = performance.now() + 8000;
+        showToast("TURBO", "Root access granted. Hold <b>W</b> for 8 seconds of turbo.", false, 3000);
+      }
+    }
     if (tag === "input" || tag === "textarea" || ((tag === "button" || tag === "a") && k === " ")) return;
     boost = e.shiftKey;
     if (FWD[k]) { throttle = 1; e.preventDefault(); }
@@ -980,7 +1146,7 @@
   var beam = $("#beam"), speedlines = $("#speedlines");
   var posters = [].slice.call(document.querySelectorAll(".poster"));
   var cur = 0, last = performance.now(), dist = 0, lastNight = -1, lastActive = null;
-  var autoEl = $("#auto"), autoX = 2600, cowBubble = null;
+  var autoEl = $("#auto"), autoX = 2600, cowBubble = null, regionGroups = [];
   var speed = 0, prevSpeed = 0, wheelie = 0, clock = 0, lastRs = null;
 
   function frame(now) {
@@ -989,7 +1155,7 @@
     var vw = window.innerWidth, vh = window.innerHeight, mobile = vw < 760;
 
     // Keyboard throttle drives the page scroll.
-    var targetVel = throttle * (boost ? 1700 : 950);
+    var targetVel = throttle * (now < turboUntil ? 2800 : boost ? 1700 : 950);
     throttleVel += (targetVel - throttleVel) * Math.min(1, dt * 3);
     if (Math.abs(throttleVel) > 5) window.scrollBy(0, throttleVel * dt * SCROLL_PER_PX);
 
@@ -1045,6 +1211,10 @@
     autoEl.style.transform = "translate3d(" + autoScreen.toFixed(1) + "px,0,0) scale(" + (mobile ? 0.65 : 1) + ")";
     if (cowBubble) cowBubble.classList.toggle("show", Math.abs(cur - (COW_X - 480)) < 260);
 
+    regionGroups.forEach(function (g) { g.el.classList.toggle("off", cur < g.from || cur > g.to); });
+    if (dx < -1.5 && cur > CP.school.x - 200 && cur < CP.school.x + 700) unlock("backwards");
+    updateWeather(dt, dx, vw, vh);
+
     // Exhaust
     puffT -= dt;
     if (puffT <= 0) { spawnPuff(); puffT = kmh > 3 ? Math.max(0.05, 0.14 - kmh / 900) : 0.55; }
@@ -1058,7 +1228,7 @@
     var sp = Math.min(1, p / 0.9);
     sun.style.transform = "translate(" + (vw * (0.12 + sp * 0.76) - 60).toFixed(0) + "px," + (vh * (0.5 - Math.sin(sp * Math.PI) * 0.4) + Math.max(0, p - 0.82) * vh * 3).toFixed(0) + "px)";
     var mp = Math.max(0, (p - 0.8) / 0.2);
-    moon.style.transform = "translate(" + (vw * (0.86 - mp * 0.16)).toFixed(0) + "px," + (vh * (0.55 - mp * 0.4)).toFixed(0) + "px)";
+    moon.style.transform = "translate(" + (vw * (0.86 - mp * 0.5)).toFixed(0) + "px," + (vh * (0.55 - mp * 0.4)).toFixed(0) + "px)";
 
     // Hero fades as you leave the garage.
     var h = Math.max(0, 1 - cur / 600);
@@ -1100,11 +1270,15 @@
   // ------------------------------------------------------------------
   buildSky(); buildClouds(); buildFar(); buildMid(); buildNear(); buildFront(); buildGround(); buildGlow(); buildSpeedo();
   cowBubble = document.querySelector(".cow .bubble");
+  regionGroups = [].map.call(document.querySelectorAll(".rg"), function (el) {
+    return { el: el, from: +el.getAttribute("data-from"), to: +el.getAttribute("data-to") };
+  });
   renderTrophies();
   layout();
   var wasMobile = isMobile();
+  sizeWeather();
   window.addEventListener("resize", function () {
-    layout();
+    layout(); sizeWeather();
     if (isMobile() !== wasMobile) { wasMobile = isMobile(); buildGlow(); }
   });
   setSound(false);
@@ -1114,6 +1288,11 @@
   function riderHint() {
     showToast("RIDER", (isMobile() ? "Swipe up" : "Scroll or hold <b>W / ↑</b>") + ' to ride. Engine sound is <button class="sound-toggle sound-state" type="button">' + (audio.on ? "ON" : "OFF") + "</button>", false, 6500);
   }
+  moon.addEventListener("click", function () {
+    if (lastNight < 0.3) return;
+    unlock("moon");
+    showToast("THE MOON SAYS", "Ship it. Then go for a night ride.", false, 2600);
+  });
   var intro = $("#intro");
   if (!intro) { riderHint(); }
   else {

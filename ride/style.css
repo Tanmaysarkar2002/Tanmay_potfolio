@@ -253,6 +253,12 @@ button { font: inherit; color: inherit; }
 @keyframes wave { 30% { opacity: 1; } 100% { opacity: 0; } }
 .cap { transform-box: fill-box; transform-origin: center; animation: toss 3.2s ease-in-out infinite; }
 @keyframes toss { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-70px) rotate(200deg); } }
+.rg { transition: opacity .9s; }
+.rg.off { opacity: 0; }
+.flag { transform-box: fill-box; transform-origin: top center; animation: flutter 1.1s ease-in-out infinite alternate; }
+@keyframes flutter { from { transform: skewX(-8deg) scaleY(.94); } to { transform: skewX(9deg) scaleY(1.04); } }
+.fire { transform-box: fill-box; transform-origin: bottom center; animation: fire .35s ease-in-out infinite alternate; }
+@keyframes fire { from { transform: scale(.92, .9) skewX(-4deg); } to { transform: scale(1.06, 1.08) skewX(4deg); } }
 .bob { animation: bob-boat 2.6s ease-in-out infinite; }
 @keyframes bob-boat { 50% { transform: translateY(2px) rotate(1deg); } }
 .tail { transform-box: view-box; animation: swish 1.6s ease-in-out infinite alternate; }
@@ -273,6 +279,9 @@ button { font: inherit; color: inherit; }
 .auto svg { display: block; overflow: visible; }
 .auto .w { animation: spin .5s linear infinite reverse; }
 #front { bottom: -4px; z-index: 5; pointer-events: none; }
+.haze { position: absolute; inset: 0; z-index: 3; pointer-events: none; transition: background .4s; }
+.weather { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
+.moon { cursor: pointer; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 760px) {
@@ -307,6 +316,6 @@ button { font: inherit; color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .card { transition: opacity .2s; }
-  .stars span, .doodles span, .sun svg, .speedlines i, #glow .bulb, .blades, .kite, .bob, .balloon, .plane, .led, .wave, .cap, .tail, .flock, .flock path, .auto .w { animation: none; }
+  .stars span, .doodles span, .sun svg, .speedlines i, #glow .bulb, .blades, .kite, .bob, .balloon, .flag, .fire, .plane, .led, .wave, .cap, .tail, .flock, .flock path, .auto .w { animation: none; }
   .rider .scarf { animation: none; }
 }
