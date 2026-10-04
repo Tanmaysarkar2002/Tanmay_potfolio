@@ -1,497 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <title>Tanmay Sarkar</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="Free HTML Templates" name="keywords">
-    <meta content="Free HTML Templates" name="description">
-
-    <!-- Favicon -->
-    <link href="img/about.jpg" rel="icon">
-
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet"> 
-
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Libraries Stylesheet -->
-    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-    <link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet">
-
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="css/style.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tanmay Sarkar — The Ride</title>
+  <meta name="description" content="Tanmay Sarkar — Backend & Infrastructure Engineer (SDE III). Kick-start the bike and ride through my journey: Python, Rust, Kubernetes, Kafka, AI security.">
+  <meta property="og:title" content="Tanmay Sarkar — The Ride">
+  <meta property="og:description" content="A hand-drawn motorbike ride through my journey as a backend & infrastructure engineer.">
+  <meta property="og:url" content="https://tanmaysarkar.dev/">
+  <meta name="theme-color" content="#f4f1ea">
+  <link rel="preload" href="ride/fonts/cabin-sketch-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="ride/fonts/patrick-hand-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="ride/style.css">
 </head>
+<body>
+  <!-- Shared sketch defs -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4"/>
+        <feDisplacementMap in="SourceGraphic" scale="3"/>
+      </filter>
+      <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="7" stroke="#1f1f24" stroke-width="1.1" opacity=".55"/>
+      </pattern>
+      <pattern id="hatch-light" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">
+        <line x1="0" y1="0" x2="0" y2="10" stroke="#1f1f24" stroke-width="1" opacity=".28"/>
+      </pattern>
+      <pattern id="bricks" width="40" height="20" patternUnits="userSpaceOnUse">
+        <path d="M0 0.5 H40 M0 10.5 H40 M20 0 V10 M0 10 V20 M40 10 V20" stroke="#1f1f24" stroke-width="1" opacity=".35" fill="none"/>
+      </pattern>
+    </defs>
+  </svg>
 
-<body data-spy="scroll" data-target=".navbar" data-offset="51">
-    <!-- Navbar Start -->
-    <nav class="navbar fixed-top shadow-sm navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-lg-5">
-        <a href="index.html" class="navbar-brand ml-lg-3">
-            <h1 class="m-0 display-5"><span class="text-primary">Tanmay</span>Sarkar</h1>
-        </a>
-        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse px-lg-3" id="navbarCollapse">
-            <div class="navbar-nav m-auto py-0">
-                <a href="#home" class="nav-item nav-link active">Home</a>
-                <a href="#about" class="nav-item nav-link">About</a>
-                <a href="#Resume" class="nav-item nav-link">Resume</a>
-                <a href="#skill" class="nav-item nav-link">Skill</a>
-                <!-- <a href="#service" class="nav-item nav-link">Service</a> -->
-                <a href="#portfolio" class="nav-item nav-link">Projects</a>
-                <!-- <a href="#testimonial" class="nav-item nav-link">Review</a>/ -->
-                <!-- <a href="#blog" class="nav-item nav-link">Blog</a> -->
-                <a href="#contact" class="nav-item nav-link">Contact</a>
-            </div>
-            <a href="#contact" class="btn btn-outline-primary d-none d-lg-block">Contact Me</a>
-        </div>
+  <!-- Intro: why a motorbike + loading -->
+  <div class="intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+    <div class="intro-card">
+      <p class="intro-eyebrow">before we ride</p>
+      <h2 id="intro-title">Why a motorbike?</h2>
+      <p>I ride. I've taken my bike up to Ladakh and gone on solo trips, and my career has felt the same way: less like a ladder, more like a road trip. School in Malda, college in Gwalior, a first job in Pune, and now Jaipur. So instead of a list, here's the ride.</p>
+      <blockquote>“Four wheels move the body. Two wheels move the soul.”<cite>a riders' saying</cite></blockquote>
+      <div class="fuel">
+        <svg viewBox="0 0 160 96" aria-hidden="true">
+          <path d="M22 80 A58 58 0 0 1 138 80" fill="none" stroke="#1f1f24" stroke-width="3" stroke-linecap="round"/>
+          <path d="M120 40 A58 58 0 0 1 138 80" fill="none" stroke="#ff6b35" stroke-width="6" stroke-linecap="round" opacity=".7"/>
+          <path d="M28 60 l6 3 M47 38 l5 5 M80 22 v7 M113 38 l-5 5 M132 60 l-6 3" stroke="#1f1f24" stroke-width="2.4" stroke-linecap="round"/>
+          <text x="16" y="94" font-family="Cabin Sketch, cursive" font-weight="700" font-size="16" fill="#1f1f24">E</text>
+          <text x="136" y="94" font-family="Cabin Sketch, cursive" font-weight="700" font-size="16" fill="#1f1f24">F</text>
+          <g id="fuel-needle" transform="rotate(-70 80 80)"><line x1="80" y1="80" x2="80" y2="32" stroke="#ff6b35" stroke-width="4" stroke-linecap="round"/></g>
+          <circle cx="80" cy="80" r="7" fill="#1f1f24"/>
+        </svg>
+        <div><b>FUEL</b><p id="intro-status" aria-live="polite">Checking tyre pressure…</p></div>
+      </div>
+      <div class="intro-actions" id="intro-actions">
+        <button class="btn primary" id="kick-btn" type="button">Kick-start with sound</button>
+        <button class="btn" id="mute-btn" type="button">Ride on mute</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <header class="hud">
+    <a class="brand plate" href="#" data-jump="0" aria-label="Tanmay Sarkar, back to the garage"><span class="ind" aria-hidden="true"><i></i>IND</span><b>TANMAY S</b></a>
+    <nav class="route" aria-label="Journey checkpoints">
+      <div class="route-track"></div><div class="route-fill"></div>
+      <div class="route-bike" aria-hidden="true"><svg viewBox="0 0 28 18" width="28" height="18"><circle cx="6" cy="13" r="4.5" fill="#fbfaf6" stroke="#1f1f24" stroke-width="2"/><circle cx="22" cy="13" r="4.5" fill="#fbfaf6" stroke="#1f1f24" stroke-width="2"/><path d="M6 13 L12 7 H18 L22 13 M17 4 L19 7" fill="none" stroke="#1f1f24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 7 Q14 3 18 6 Z" fill="#ff6b35" stroke="#1f1f24" stroke-width="1.5"/></svg></div>
     </nav>
-    <!-- Navbar End -->
-
-
-    <!-- Video Modal Start -->
-    <!-- <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>         -->
-                    <!-- 16:9 aspect ratio -->
-                    <!-- <div class="embed-responsive embed-responsive-16by9">
-                        <iframe class="embed-responsive-item" src="" id="video"  allowscriptaccess="always" allow="autoplay"></iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-    <!-- Video Modal End -->
-
-
-    <!-- Header Start -->
-    <div class="container-fluid bg-primary d-flex align-items-center mb-5 py-5" id="home" style="min-height: 100vh;">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-5 px-5 pl-lg-0 pb-5 pb-lg-0">
-                    <img class="img-fluid w-100 rounded-circle shadow-sm" src="img/profile.jpg" alt="">
-                </div>
-                <div class="col-lg-7 text-center text-lg-left">
-                    <h3 class="text-white font-weight-normal mb-3">I'm</h3>
-                    <h1 class="display-3 text-uppercase text-primary mb-2" style="-webkit-text-stroke: 2px #ffffff;">Tanmay Sarkar</h1>
-                    <h1 class="typed-text-output d-inline font-weight-lighter text-white"></h1>
-                    <div class="typed-text d-none">Backend Developer, Automation Engineer</div>
-                    <div class="d-flex align-items-center justify-content-center justify-content-lg-start pt-5">
-                        <a href="https://drive.google.com/file/d/1gTwUldj4om09PPkzUUjL5wSXbaeYlcZ5/view?usp=sharing" class="btn btn-outline-light mr-5">Download CV</a>
-                        <!--  -->
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="hud-buttons">
+      <button class="sq" id="sound-btn" aria-label="Toggle engine sound" title="Engine sound">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="wave" d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12" opacity=".25"/><path class="mute" d="M16 9l5 6M21 9l-5 6"/></svg>
+      </button>
+      <button class="sq" id="trophy-btn" aria-label="Achievements" title="Achievements">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8M9 17h6"/></svg>
+        <span class="badge" id="trophy-count">0</span>
+      </button>
+      <a class="sq" href="https://drive.google.com/file/d/1gTwUldj4om09PPkzUUjL5wSXbaeYlcZ5/view?usp=sharing" target="_blank" rel="noopener">Resume</a>
     </div>
-    <!-- Header End -->
+  </header>
 
+  <aside class="panel" id="trophy-panel" aria-label="Achievements">
+    <h3>Achievements</h3>
+    <ul id="trophy-list"></ul>
+  </aside>
 
-    <!-- About Start -->
-    <div class="container-fluid py-5" id="about">
-        <div class="container">
-            <div class="position-relative d-flex align-items-center justify-content-center">
-                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">About</h1>
-                <h1 class="position-absolute text-uppercase text-primary">About Me</h1>
-            </div>
-            <div class="row align-items-center">
-                <div class="col-lg-5 pb-4 pb-lg-0">
-                    <img class="img-fluid rounded w-100" src="img/about.jpg" alt="">
-                </div>
-                <div class="col-lg-7">
-                    <h3 class="mb-4">Backend Developer & Automation Engineer</h3>
-                    <p>I am a Back-end Engineer with expertise in building robust and scalable systems using Python and its versatile frameworks like Django, DRF, Flask, and FastAPI. My passion lies in solving complex problems, optimizing performance, and crafting innovative solutions that deliver real-world impact. Always eager to learn, I continuously explore emerging technologies to expand my skill set and refine my craft.</p>
-                    <div class="row mb-3">
-                        <div class="col-sm-6 py-2"><h6>Name: <span class="text-secondary">Tanmay Sarkar</span></h6></div>
-                        <div class="col-sm-6 py-2"><h6>Birthday: <span class="text-secondary">1 March 2002</span></h6></div>
-                        <div class="col-sm-6 py-2"><h6>Degree: <span class="text-secondary">Bachelor's </span></h6></div>
-                        <div class="col-sm-6 py-2"><h6>Experience: <span class="text-secondary">2 Years</span></h6></div>
-                        <div class="col-sm-6 py-2"><h6>Phone: <span class="text-secondary">+91 8617315294</span></h6></div>
-                        <div class="col-sm-6 py-2"><h6>Email: <span class="text-secondary">tanmaysarkar959@gmail.com</span></h6></div>
-                        <div class="col-sm-6 py-2"><h6>Address: <span class="text-secondary">Malda,WestBengal, India</span></h6></div>
-                        <div class="col-sm-6 py-2"><h6>Freelance: <span class="text-secondary">Available</span></h6></div>
-                    </div>
-                    <a href="#contact" class="btn btn-outline-primary mr-4">Contact Me</a>
-                    <!-- <a href="" class="btn btn-outline-primary">Learn More</a> -->
-                </div>
-            </div>
-        </div>
+  <div class="speedo" aria-hidden="true">
+    <svg viewBox="0 0 128 92">
+      <path d="M14 70 A52 52 0 1 1 114 70" fill="#fbfaf6" stroke="#1f1f24" stroke-width="2.5" stroke-linecap="round" filter="url(#rough)"/>
+      <g id="speedo-ticks" stroke="#1f1f24" stroke-width="2" stroke-linecap="round"></g>
+      <path d="M92 26 A52 52 0 0 1 114 70" fill="none" stroke="#ff6b35" stroke-width="5" opacity=".7"/>
+      <g class="needle" id="needle"><line x1="64" y1="64" x2="64" y2="22" stroke="#ff6b35" stroke-width="3.5" stroke-linecap="round"/></g>
+      <circle cx="64" cy="64" r="6" fill="#1f1f24"/>
+      <text x="64" y="86" text-anchor="middle" font-family="Patrick Hand" font-size="15" fill="#1f1f24"><tspan id="speed">0</tspan> km/h · <tspan id="gear">N</tspan></text>
+    </svg>
+  </div>
+
+  <div class="stage">
+    <div class="sky" id="sky"><div class="sky-wash" id="sky-wash"></div></div>
+    <div class="sun" id="sun"></div>
+    <div class="layer" id="clouds" data-f="0.08"></div>
+    <div class="flock" aria-hidden="true">
+      <svg viewBox="0 0 120 50"><path d="M0 20 q7 -8 14 0 q7 -8 14 0"/><path d="M34 6 q6 -7 12 0 q6 -7 12 0"/><path d="M40 34 q6 -7 12 0 q6 -7 12 0"/><path d="M70 18 q5 -6 10 0 q5 -6 10 0"/></svg>
     </div>
-    <!-- About End -->
-
-
-    <!-- Qualification Start -->
-    <div class="container-fluid py-5" id="Resume">
-        <div class="container">
-            <div class="position-relative d-flex align-items-center justify-content-center">
-                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Resume</h1>
-                <h1 class="position-absolute text-uppercase text-primary">Education & Expericence</h1>
-            </div>
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h3 class="mb-4">My Education</h3>
-                    <div class="border-left border-primary pt-2 pl-4 ml-2">
-                        <div class="position-relative mb-4">
-                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -32px;"></i>
-                            <h5 class="font-weight-bold mb-1">Bachelor's In ECE</h5>
-                            <p class="mb-2"><strong>Rustamji Institute of Technology</strong> | <small>2020 - 2024</small></p>
-                            <p>Bachelor of Technology- Electronics and Communication Engineering; GPA: 8.1</p>
-                        </div>
-                        <div class="position-relative mb-4">
-                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -32px;"></i>
-                            <h5 class="font-weight-bold mb-1">Higher Secondary</h5>
-                            <p class="mb-2"><strong>Kendriya Vidyalaya Malda</strong> | <small>2019 - 2020</small></p>
-                            <p>PCM with Computer Science(Higher Secondary); CBSE: 72</p>
-                        </div>
-                        <!-- <div class="position-relative mb-4">
-                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -32px;"></i>
-                            <h5 class="font-weight-bold mb-1">Master In CSE</h5>
-                            <p class="mb-2"><strong>Cambridge University</strong> | <small>2000 - 2050</small></p>
-                            <p>Tempor eos dolore amet tempor dolor tempor. Dolore ea magna sit amet dolor eirmod. Eos ipsum est tempor dolor. Clita lorem kasd sed ea lorem diam ea lorem eirmod duo sit ipsum stet lorem diam</p>
-                        </div> -->
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <h3 class="mb-4">My Expericence</h3>
-                    <div class="border-left border-primary pt-2 pl-4 ml-2">
-                        <div class="position-relative mb-4">
-                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -32px;"></i>
-                            <h5 class="font-weight-bold mb-1">Associate Software Engineer</h5>
-                            <p class="mb-2"><strong>Izoologic</strong> | <small>July 2024- Present</small></p>
-                            <p>
-                                <ul>
-                                  <li>Automated Processes Across Multiple Sites: Designed and developed custom automation tools, reducing manual workload and increasing productivity.</li>
-                                  <li>Built Captcha Solvers: Created text and image-based Captcha solvers from scratch, improving data extraction efficiency and accuracy.</li>
-                                  <li>Enhanced Project Planning: Contributed strategic insights during planning sessions, streamlining development workflows and optimizing timelines.</li>
-                                </ul>
-                              </p>
-                            
-                        </div>
-                        <div class="position-relative mb-4">
-                            <i class="far fa-dot-circle text-primary position-absolute" style="top: 2px; left: -32px;"></i>
-                            <h5 class="font-weight-bold mb-1">Solytics Partners</h5>
-                            <p class="mb-2"><strong>Backend Developer Intern</strong> | <small>Mar 2023- June 2024</small></p>
-                            <p>
-                                
-                                <ul>
-                                  <li> Developed robust APIs: Designed and built APIs from scratch, ensuring efficiency and scalability.</li>
-                                  <li>Strengthened Security: Implemented robust authentication mechanisms, enhancing project security and data protection.</li>
-                                  <li>Created Data Extraction Tools: Created scripts to extract data from various sources including websites, PDFs, and JSON files using tools like Selenium, Beautiful Soup, and Scrapy.</li>
-                                  <li>Expanded Technical Knowledge: Gained exposure to AWS, ElasticSearch, and Airflow, enhancing understanding of cloud services and data management tools.</li>
-                                  <li>Collaborated in a Cross-Functional Team: Worked with a team of 5+ engineers, achieving project milestones through effective communication and collaborative problem-solving.</li>
-                                </ul>
-                              </p>
-                              
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="flock f2" aria-hidden="true">
+      <svg viewBox="0 0 120 50"><path d="M0 20 q7 -8 14 0 q7 -8 14 0"/><path d="M30 34 q6 -7 12 0 q6 -7 12 0"/><path d="M52 10 q5 -6 10 0 q5 -6 10 0"/></svg>
     </div>
-    <!-- Qualification End -->
-
-
-    <!-- Skill Start -->
-    <div class="container-fluid py-5" id="skill">
-        <div class="container">
-            <div class="position-relative d-flex align-items-center justify-content-center">
-                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Skills</h1>
-                <h1 class="position-absolute text-uppercase text-primary">My Skills</h1>
-            </div>
-            <div class="row align-items-center">
-                <div class="col-12">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        
-                    <!-- Languages Section -->
-                    <div class="mb-4 text-center">
-                        <h6 class="h6font font-weight-bold ju">Languages</h6>
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <div class="skill-container">
-                                <img src="img/python.svg" alt="Python" class="skill-icon">
-                                <p class="skill-name">Python</p>
-                              </div>
-                              
-                              <div class="skill-container">
-                                <img src="img/c++.svg" alt="C++" class="skill-icon">
-                                <p class="skill-name">C++</p>
-                              </div>
-                            
-                              <div class="skill-container">
-                                <img src="img/JavaScript.svg" alt="JavaScript" class="skill-icon">
-                                <p class="skill-name">JavaScript</p>
-                              </div>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <!-- Frameworks Section -->
-                    <div class="mb-4 text-center">
-                        <h6 class="h6font font-weight-bold">Frameworks</h6>
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <div class="skill-container">
-                              <img src="img/django.svg" alt="Django" class="skill-icon">
-                              <p class="skill-name">Django</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/flask.svg" alt="Flask" class="skill-icon">
-                              <p class="skill-name">Flask</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/fastapi.svg" alt="FastAPI" class="skill-icon">
-                              <p class="skill-name">FastAPI</p>
-                            </div>
-                          </div>
-                    </div>
-                    <hr>
-                    <!-- Databases Section -->
-                    <div class="mb-4 text-center">
-                        <h6 class="h6font font-weight-bold">Databases</h6>
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <div class="skill-container">
-                              <img src="img/mysql.svg" alt="MySql" class="skill-icon">
-                              <p class="skill-name">MySQL</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/postgresql.svg" alt="Postgresql" class="skill-icon">
-                              <p class="skill-name">PostgreSQL</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/elasticsearch.svg" alt="ElasticSearch" class="skill-icon">
-                              <p class="skill-name">ElasticSearch</p>
-                            </div>
-                          </div>
-                    </div>
-                    <hr>
-                    <!-- Tools Section -->
-                    <div class="mb-4 text-center">
-                        <h6 class="h6font font-weight-bold">Tools</h6>
-                        <div class="d-flex flex-wrap justify-content-center">
-                            <div class="skill-container">
-                              <img src="img/selenium-svgrepo-com.svg" alt="Selenium" class="skill-icon">
-                              <p class="skill-name">Selenium</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/airflow-svgrepo-com.svg" alt="Airflow" class="skill-icon">
-                              <p class="skill-name">Airflow</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/scrapy.svg" alt="Scrapy" class="skill-icon">
-                              <p class="skill-name">Scrapy</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/pytest.svg" alt="Pytest" class="skill-icon">
-                              <p class="skill-name">Pytest</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/git.svg" alt="Git" class="skill-icon">
-                              <p class="skill-name">Git</p>
-                            </div>
-                            
-                            <div class="skill-container">
-                              <img src="img/github.svg" alt="Github" class="skill-icon">
-                              <p class="skill-name">Github</p>
-                            </div>
-                          </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="layer" id="far" data-f="0.15"></div>
+    <div class="layer" id="mid" data-f="0.5"></div>
+    <div class="layer" id="near" data-f="0.75"></div>
+    <div class="layer ground" id="ground" data-f="1">
+      <div class="road"><div class="road-line"></div><div class="road-edge"></div></div>
     </div>
-    
-    
-    <!-- Skill End -->
+    <div class="night"></div>
+    <div class="stars" id="stars"></div>
+    <div class="moon" id="moon"></div>
+    <div class="layer" id="glow" data-f="1"></div>
+    <div class="paper-grain"></div>
 
-
-    
-
-
-    <!-- Projects Start -->
-    <div class="container-fluid pt-5 pb-3" id="portfolio">
-        <div class="container">
-            <div class="position-relative d-flex align-items-center justify-content-center">
-                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Projects</h1>
-                <h1 class="position-absolute text-uppercase text-primary">My Projects</h1>
-            </div>
-            <div class="row">
-                <div class="col-12 text-center mb-2">
-                    <ul class="list-inline mb-4" id="portfolio-flters">
-                        <li class="btn btn-sm btn-outline-primary m-1 active"  data-filter="*">All</li>
-                        <!-- <li class="btn btn-sm btn-outline-primary m-1" data-filter=".first">Design</li>
-                        <li class="btn btn-sm btn-outline-primary m-1" data-filter=".second">Development</li>
-                        <li class="btn btn-sm btn-outline-primary m-1" data-filter=".third">Marketing</li> -->
-                    </ul>
-                </div>
-            </div>
-            <div class="row portfolio-container">
-                <!-- Project 1 -->
-                <div class="col-lg-4 col-md-6 mb-4 portfolio-item first">
-                    <div class="position-relative overflow-hidden mb-2">
-                        <img class="img-fluid rounded w-100" src="img/project-1.jpg" alt="Project 1">
-                        
-                    </div>
-                    <!-- Project Description -->
-                    <div class="portfolio-description text-center">
-                        <h5 class="font-weight-bold">PFM (Personal Finance Manager) </h5>
-                        <p>A user-friendly platform for managing personal finances and setting financial goals..</p>
-                        <a href="https://github.com/Tanmaysarkar2002/PFM-Backend" class="btn btn-primary" target="_blank">Source Code</a>
-                    </div>
-                </div>
-            
-                <!-- Project 2 -->
-                <div class="col-lg-4 col-md-6 mb-4 portfolio-item second">
-                    <div class="position-relative overflow-hidden mb-2">
-                        <img class="img-fluid rounded w-100" src="img/web-scraping-620x350.jpg" alt="Project 2">
-                        
-                    </div>
-                    <!-- Project Description -->
-                    <div class="portfolio-description text-center">
-                        <h5 class="font-weight-bold">Data Harvester</h5>
-                        <p>A Universal Web Scraper.</p>
-                        <a href="https://github.com/Tanmaysarkar2002/Universal-Scrapper" class="btn btn-primary" target="_blank">Source Code</a>
-                    </div>
-                </div>
-            
-                <!-- Project 3 -->
-                <div class="col-lg-4 col-md-6 mb-4 portfolio-item third">
-                    <div class="position-relative overflow-hidden mb-2">
-                        <img class="img-fluid rounded w-100" src="img/sddefault.jpg" alt="Project 3">
-                        
-                    </div>
-                    <!-- Project Description -->
-                    <div class="portfolio-description text-center">
-                        <h5 class="font-weight-bold">Linkedin Jobs Sraper</h5>
-                        <p>A scraper That scrapes Jobs
-                            from various domain.</p>
-                        <a href="https://github.com/Tanmaysarkar2002/Linked__scraping__Database" class="btn btn-primary" target="_blank">Source Code</a>
-                    </div>
-                </div>
-            </div>
-                <!-- Repeat for more projects as needed -->
-            </div>
-        </div>
+    <div class="doodles" id="doodles" aria-hidden="true">
+      <span style="left:14%;top:18%">✳</span>
+      <span style="left:22%;top:40%;animation-delay:-1s">○</span>
+      <span style="left:80%;top:22%;animation-delay:-2s">✈</span>
+      <span style="left:72%;top:46%;animation-delay:-.5s">☕</span>
+      <span style="left:88%;top:36%;animation-delay:-3s">✳</span>
+      <span style="left:9%;top:52%;animation-delay:-1.5s">{ }</span>
     </div>
-    <!-- Portfolio End -->
 
+    <section class="hero" id="hero">
+      <p class="eyebrow">hey, I'm</p>
+      <h1>Tanmay<span>.</span></h1>
+      <p class="role">&lt; <b>backend</b> &amp; <b>infra</b> engineer /&gt;</p>
+    </section>
 
-
-    <!-- Contact Start -->
-    <div class="container-fluid py-5" id="contact">
-        <div class="container">
-            <div class="position-relative d-flex align-items-center justify-content-center">
-                <h1 class="display-1 text-uppercase text-white" style="-webkit-text-stroke: 1px #dee2e6;">Contact</h1>
-                <h1 class="position-absolute text-uppercase text-primary">Contact Me</h1>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="contact-form text-center">
-                        <div id="success"></div>
-                        <form name="sentMessage" id="contactForm" novalidate="novalidate">
-                            <div class="form-row">
-                                <div class="control-group col-sm-6">
-                                    <input type="text" class="form-control p-4" id="name" placeholder="Your Name"
-                                        required="required" data-validation-required-message="Please enter your name" />
-                                    <p class="help-block text-danger"></p>
-                                </div>
-                                <div class="control-group col-sm-6">
-                                    <input type="email" class="form-control p-4" id="email" placeholder="Your Email"
-                                        required="required" data-validation-required-message="Please enter your email" />
-                                    <p class="help-block text-danger"></p>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <input type="text" class="form-control p-4" id="subject" placeholder="Subject"
-                                    required="required" data-validation-required-message="Please enter a subject" />
-                                <p class="help-block text-danger"></p>
-                            </div>
-                            <div class="control-group">
-                                <textarea class="form-control py-3 px-4" rows="5" id="message" placeholder="Message"
-                                    required="required"
-                                    data-validation-required-message="Please enter your message"></textarea>
-                                <p class="help-block text-danger"></p>
-                            </div>
-                            <div>
-                                <button class="btn btn-outline-primary" type="submit" id="sendMessageButton">Send
-                                    Message</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="auto" id="auto" aria-hidden="true">
+      <svg viewBox="0 0 140 100" width="140" height="100">
+        <g filter="url(#rough)" stroke="#1f1f24" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M34 10 Q78 -2 124 10 L126 50 L34 50 Z" fill="#2b2d42"/>
+          <path d="M34 10 Q78 -2 124 10" fill="none" stroke="#ffd166" stroke-width="4"/>
+          <path d="M14 80 L20 40 Q24 26 36 24 L36 80 Z" fill="#ffd166"/>
+          <rect x="36" y="50" width="92" height="30" rx="4" fill="#7cc36a"/>
+          <path d="M24 40 L32 26 L36 26 L36 50 L26 50 Z" fill="#fbfaf6"/>
+          <path d="M60 50 V22 M100 50 V18" fill="none"/>
+          <circle cx="56" cy="36" r="6" fill="#e8c99a"/>
+          <circle cx="18" cy="58" r="4.5" fill="#fff6d8"/>
+          <path d="M40 62 H120" stroke-width="1.4" fill="none"/>
+        </g>
+        <g class="w" style="transform-origin:28px 84px"><circle cx="28" cy="84" r="11" fill="#1f1f24"/><path d="M20 84 H36 M28 76 V92" stroke="#fbfaf6" stroke-width="2"/></g>
+        <g class="w" style="transform-origin:108px 84px"><circle cx="108" cy="84" r="13" fill="#1f1f24"/><path d="M98 84 H118 M108 74 V94" stroke="#fbfaf6" stroke-width="2"/></g>
+      </svg>
     </div>
-    <!-- Contact End -->
+    <div class="beam" id="beam"></div>
+    <div class="speedlines" id="speedlines"><i style="top:10px;width:70px"></i><i style="top:34px;width:110px;animation-delay:-.12s"></i><i style="top:58px;width:60px;animation-delay:-.22s"></i><i style="top:80px;width:90px;animation-delay:-.05s"></i></div>
+    <div id="puffs"></div>
 
-
-    <!-- Footer Start -->
-    <div class="container-fluid bg-primary text-white mt-5 py-5 px-sm-3 px-md-5">
-        <div class="container text-center py-5">
-            <div class="d-flex justify-content-center mb-4">
-                <a class="btn btn-light btn-social mr-2" href="https://twitter.com/TanmayS57016229"><i class="fab fa-twitter"></i></a>
-                <a class="btn btn-light btn-social mr-2" href="https://github.com/Tanmaysarkar2002"><i class="fab fa-github"></i></a>
-                <a class="btn btn-light btn-social mr-2" href="https://www.linkedin.com/in/tanmay-sarkar-716bb4156/"><i class="fab fa-linkedin-in"></i></a>
-                <a class="btn btn-light btn-social" href="https://www.instagram.com/tanmay_sarkar2002/"><i class="fab fa-instagram"></i></a>
-            </div>
-            <!-- <div class="d-flex justify-content-center mb-3">
-                <a class="text-white" href="#">Privacy</a>
-                <span class="px-3">|</span>
-                <a class="text-white" href="#">Terms</a>
-                <span class="px-3">|</span>
-                <a class="text-white" href="#">FAQs</a>
-                <span class="px-3">|</span>
-                <a class="text-white" href="#">Help</a>
-            </div> -->
-            <p class="m-0">&copy; <a class="text-white font-weight-bold" href="#">Tanmay Sarkar</a>. All Rights Reserved.
-            </p>
-        </div>
+    <div class="rider" id="rider" role="button" tabindex="0" aria-label="Honk the horn">
+      <svg viewBox="0 0 240 170" aria-hidden="true">
+        <g id="bike">
+          <!-- far-side peashooter -->
+          <path class="ink" d="M100 128 L34 114 Q26 113 26 118 Q28 122 34 122 L100 134 Z" fill="#9aa0a8"/>
+          <!-- wire-spoked wheels -->
+          <g transform="translate(58 132)">
+            <circle r="33" class="tyre"/>
+            <g id="wheel-r"><circle r="33" class="tread"/><circle r="27.5" fill="none" stroke="#9aa0a8" stroke-width="2.2"/><g class="spokes"></g></g>
+            <circle r="6" fill="#c9ccd1" stroke="#1f1f24" stroke-width="2"/>
+          </g>
+          <g transform="translate(194 132)">
+            <circle r="33" class="tyre"/>
+            <g id="wheel-f"><circle r="33" class="tread"/><circle r="27.5" fill="none" stroke="#9aa0a8" stroke-width="2.2"/><g class="spokes"></g></g>
+            <circle r="11" fill="none" stroke="#9aa0a8" stroke-width="3"/>
+            <circle r="6" fill="#c9ccd1" stroke="#1f1f24" stroke-width="2"/>
+          </g>
+          <!-- rear: fender, twin shocks, swingarm -->
+          <path d="M24 114 Q30 94 62 96" fill="none" stroke="#1f1f24" stroke-width="6" stroke-linecap="round"/>
+          <path d="M24 114 Q30 94 62 96" fill="none" stroke="#e6e8eb" stroke-width="3" stroke-linecap="round"/>
+          <path d="M66 126 L78 86" stroke="#1f1f24" stroke-width="5" stroke-linecap="round"/>
+          <path d="M67 120 l8 -3 l-6 -4 l8 -3 l-6 -4 l8 -3 l-6 -4 l8 -3" fill="none" stroke="#e6e8eb" stroke-width="1.8"/>
+          <path class="ink" d="M58 132 L112 126" fill="none" stroke-width="5"/>
+          <!-- frame -->
+          <path class="ink" d="M112 126 L148 74 M100 106 L94 74 M94 74 L160 60" fill="none" stroke-width="4"/>
+          <!-- parallel-twin engine -->
+          <rect class="ink" x="100" y="106" width="52" height="28" rx="8" fill="#d6d9dd"/>
+          <path class="ink" d="M112 106 L116 82 H148 L146 106 Z" fill="#c9ccd1"/>
+          <path d="M117 87 H147 M116 91 H147 M115 95 H147 M114 99 H146 M113 103 H146" stroke="#1f1f24" stroke-width="1.3"/>
+          <rect class="ink" x="114" y="77" width="36" height="6" rx="2" fill="#9aa0a8"/>
+          <circle class="ink" cx="122" cy="121" r="9" fill="#eef0f2"/><circle cx="122" cy="121" r="3" fill="#9aa0a8"/>
+          <!-- near-side header + peashooter -->
+          <path d="M146 98 Q162 112 152 130 Q144 140 112 140 H98" fill="none" stroke="#1f1f24" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M146 98 Q162 112 152 130 Q144 140 112 140 H98" fill="none" stroke="#eef0f2" stroke-width="3.5" stroke-linecap="round"/>
+          <path class="ink" d="M102 136 L28 124 Q20 123 20 129 Q22 134 28 134 L102 144 Z" fill="#eef0f2"/>
+          <path d="M96 139 L32 128" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          <!-- side panel, cafe seat, rear cowl -->
+          <path class="ink" d="M74 86 L96 86 L98 102 L80 102 Z" fill="#1f1f24"/>
+          <path class="ink" d="M64 80 Q70 72 100 74 L100 84 L66 86 Z" fill="#3b2a20"/>
+          <path d="M74 77 v8 M82 75 v9 M90 75 v9" stroke="#8a6a43" stroke-width="1.2"/>
+          <path class="ink" d="M40 78 Q42 64 62 70 Q66 74 66 86 L44 88 Q38 86 40 78 Z" fill="#c8102e"/>
+          <path d="M44 74 Q52 68 60 72" stroke="#fbfaf6" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle class="ink" cx="40" cy="86" r="3.2" fill="#e63946" stroke-width="1.4"/>
+          <!-- long cafe tank -->
+          <path class="ink" d="M98 74 Q102 56 132 54 L160 56 Q172 60 168 74 Q150 84 104 84 Z" fill="#c8102e"/>
+          <path d="M108 72 Q119 65 130 72 Q119 79 108 72 Z" fill="#8f0b20" opacity=".65"/>
+          <path d="M106 62 Q134 52 164 60" stroke="#fbfaf6" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          <circle class="ink" cx="144" cy="67" r="5" fill="#e6c35c" stroke-width="1.6"/>
+          <circle class="ink" cx="134" cy="55" r="3" fill="#eef0f2" stroke-width="1.4"/>
+          <!-- forks, fender, headlamp, clocks, clip-ons -->
+          <path d="M164 60 L190 132 M172 58 L198 128" stroke="#1f1f24" stroke-width="6.5" stroke-linecap="round"/>
+          <path d="M164 60 L190 132 M172 58 L198 128" stroke="#e6e8eb" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M178 108 Q196 94 214 106" fill="none" stroke="#1f1f24" stroke-width="6" stroke-linecap="round"/>
+          <path d="M178 108 Q196 94 214 106" fill="none" stroke="#e6e8eb" stroke-width="3" stroke-linecap="round"/>
+          <circle class="ink" cx="182" cy="64" r="12" fill="#e6e8eb"/>
+          <circle cx="183" cy="64" r="8" fill="#fff6d8" stroke="#1f1f24" stroke-width="1.4"/>
+          <circle cx="185" cy="62" r="3" fill="#ffd166"/>
+          <circle class="ink" cx="167" cy="47" r="4.6" fill="#fbfaf6" stroke-width="1.8"/>
+          <circle class="ink" cx="176" cy="49" r="4.6" fill="#fbfaf6" stroke-width="1.8"/>
+          <path class="ink" d="M158 60 L172 63" fill="none" stroke-width="4"/>
+          <!-- rider: cafe-racer crouch, open-face helmet + goggles -->
+          <path class="scarf" d="M138 36 C120 32 106 40 88 32 C98 42 114 42 126 44 Z" fill="#ff6b35" stroke="#1f1f24" stroke-width="1.8" stroke-linejoin="round"/>
+          <path class="ink" d="M96 70 L132 92 L116 118" fill="none" stroke-width="12" stroke="#1f1f24"/>
+          <path class="ink" d="M96 70 L132 92 L116 118" fill="none" stroke-width="7" stroke="#3a4a6b"/>
+          <path class="ink" d="M108 118 L128 120 L126 127 L106 125 Z" fill="#6b4226"/>
+          <path class="ink" d="M86 74 L100 52 L140 32 L154 46 L114 78 Z" fill="#5a3a24"/>
+          <path d="M104 60 L144 38" stroke="#8a5a3a" stroke-width="2" stroke-linecap="round"/>
+          <path class="ink" d="M88 56 L98 38 L116 46 L106 64 Z" fill="#c8a46a"/>
+          <text x="112" y="60" font-family="Patrick Hand" font-size="12" fill="#fbfaf6" transform="rotate(-30 112 60)">&lt;/&gt;</text>
+          <path class="ink" d="M142 38 L156 56 L168 62" fill="none" stroke-width="7" stroke="#5a3a24"/>
+          <path class="ink" d="M158 30 Q168 32 168 40 L158 40 Z" fill="#e0a982" stroke-width="1.6"/>
+          <circle class="ink" cx="154" cy="22" r="14" fill="#fbfaf6"/>
+          <path d="M141 18 Q152 6 166 14" stroke="#c8102e" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M142 26 L168 22" stroke="#1f1f24" stroke-width="3"/>
+          <ellipse class="ink" cx="165" cy="24" rx="5.5" ry="4.5" fill="#ffb627" stroke-width="1.8"/>
+        </g>
+      </svg>
     </div>
-    <!-- Footer End -->
 
-    <!-- Scroll to Bottom -->
-    <i class="fa fa-2x fa-angle-down text-white scroll-to-bottom"></i>
+    <div class="haze" id="haze" aria-hidden="true"></div>
+    <canvas class="weather" id="weather" aria-hidden="true"></canvas>
+    <div class="layer" id="front" data-f="1.25" aria-hidden="true"></div>
 
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-outline-dark px-0 back-to-top"><i class="fa fa-angle-double-up"></i></a>
+    <!-- Checkpoint notes -->
+    <div class="cards">
+      <article class="card" data-cp="school">
+        <p class="when">2019 – 2020 · Malda, West Bengal</p>
+        <h2>Kendriya Vidyalaya Malda</h2>
+        <p class="sub">Higher Secondary · PCM + Computer Science</p>
+        <p>First gear. Physics, Chemistry, Maths, and Computer Science, the subject that set the direction for everything after.</p>
+        <div class="chips"><span>CBSE</span><span>PCM + CS</span></div>
+      </article>
 
+      <article class="card" data-cp="college">
+        <p class="when">2020 – 2024 · Gwalior</p>
+        <h2>Rustamji Institute of Technology</h2>
+        <p class="sub">B.Tech, Electronics &amp; Communication Engineering</p>
+        <p>Studied electronics in class and wrote backend code after hours. I started my first industry role before graduating.</p>
+        <div class="stats"><div><b>8.1</b><span>GPA / 10</span></div><div><b>4 yrs</b><span>of circuits &amp; code</span></div></div>
+      </article>
 
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/typed/typed.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/isotope/isotope.pkgd.min.js"></script>
-    <script src="lib/lightbox/js/lightbox.min.js"></script>
+      <article class="card" data-cp="solytics">
+        <p class="when">Mar 2023 – Jun 2024 · Pune</p>
+        <h2>Solytics Partners</h2>
+        <p class="sub">Backend Developer (Consultant)</p>
+        <div class="stats">
+          <div><b>65%</b><span>faster APIs<br>1.4s → 0.5s</span></div>
+          <div><b>10+</b><span>international<br>financial orgs</span></div>
+        </div>
+        <ul>
+          <li>Production REST APIs (DRF + FastAPI) for an AML SaaS platform.</li>
+          <li>Async processing with Celery and Redis pub/sub, plus query profiling.</li>
+          <li>OAuth Toolkit, JWT and API-key auth to meet compliance requirements.</li>
+          <li>AWS (EC2, S3, EKS), Elasticsearch indexing, Airflow ETL.</li>
+        </ul>
+        <div class="chips"><span>Django</span><span>FastAPI</span><span>Celery</span><span>AWS</span><span>Elasticsearch</span><span>Airflow</span></div>
+      </article>
 
-    <!-- Contact Javascript File -->
-    <script src="mail/jqBootstrapValidation.min.js"></script>
-    <script src="mail/contact.js"></script>
+      <article class="card" data-cp="izoologic">
+        <p class="when">Jul 2024 – Present · Jaipur</p>
+        <h2>IzooLogic</h2>
+        <p class="sub">Software Development Engineer III</p>
+        <div class="stats">
+          <div><b>&lt;5 min</b><span>deploys via<br>CI/CD → K8s</span></div>
+          <div><b>92%</b><span>vuln detection<br>RAG + LLM</span></div>
+          <div><b>10k+/s</b><span>Kafka events</span></div>
+        </div>
+        <ul>
+          <li>AI code-security platform with custom RAG pipelines and threat-level risk reports.</li>
+          <li>Leak-monitoring agents that scan 1M+ public messages a day.</li>
+          <li>Playwright + Scrapy crawlers across 500+ surface and onion domains.</li>
+          <li>Screenshot API serving 1,000+ req/min on Kubernetes.</li>
+          <li>Lead a team of 5: architecture, sprints, reviews. 95%+ on-time releases.</li>
+        </ul>
+        <div class="chips"><span>Kubernetes</span><span>Kafka</span><span>LLMs / RAG</span><span>Azure DevOps</span><span>Playwright</span></div>
+      </article>
 
-    <!-- Template Javascript -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    
-    <script src="js/main.js"></script>
-    
-    <script>
-        emailjs.init('BUF8TbNjYzJSj-8n_');  // Replace with your EmailJS user ID
-      </script>
+      <article class="card" data-cp="garage">
+        <p class="when">Pit stop · Refuel</p>
+        <h2>What's in the toolbox</h2>
+        <div class="skillset"><h3>Languages</h3><div class="chips"><span>Python</span><span>Rust</span><span>C++</span><span>SQL</span></div></div>
+        <div class="skillset"><h3>Backend</h3><div class="chips"><span>Django</span><span>DRF</span><span>FastAPI</span><span>Flask</span><span>Celery</span><span>Kafka</span><span>RabbitMQ</span></div></div>
+        <div class="skillset"><h3>Cloud &amp; DevOps</h3><div class="chips"><span>AWS</span><span>GCP</span><span>Docker</span><span>Kubernetes</span><span>CI/CD</span><span>Nginx</span><span>Linux</span></div></div>
+        <div class="skillset"><h3>Data &amp; AI</h3><div class="chips"><span>PostgreSQL</span><span>MySQL</span><span>Elasticsearch</span><span>Redis</span><span>LangChain</span><span>Hugging Face</span><span>Scrapy</span><span>Playwright</span><span>Airflow</span><span>Grafana</span></div></div>
+      </article>
 
+      <article class="card" data-cp="ladakh">
+        <p class="when">Off the clock · Ladakh</p>
+        <h2>Solo on two wheels</h2>
+        <p class="sub">Ladakh and solo trips on my bike</p>
+        <p>When I'm not shipping code, I'm usually on the bike. I've ridden it all the way to Ladakh and gone on solo trips where the only plan is the road ahead.</p>
+        <p>Those rides shaped how I work: plan the route, pack light, and keep going when the road gets rough.</p>
+        <div class="chips"><span>Ladakh</span><span>Solo rides</span><span>Mountain roads</span></div>
+      </article>
+
+      <article class="card mini" data-cp="projects">
+        <p class="when">Side quest · Projects</p>
+        <h2>The washing line</h2>
+        <p>Projects I built along the way are pegged up above the road. Click a poster to open its code.</p>
+      </article>
+
+      <article class="card" data-cp="finish">
+        <p class="when">Chai stop · 2026 and still riding</p>
+        <h2>Let's grab a chai ☕</h2>
+        <p>I'm open to backend, platform, and AI-infrastructure roles. If you're building something hard, I'd like to hear about it.</p>
+        <div class="cta">
+          <a class="btn primary" href="mailto:tanmaysarkar959@gmail.com">tanmaysarkar959@gmail.com</a>
+          <a class="btn" href="https://www.linkedin.com/in/tanmay-sarkar-716bb4156/" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="btn" href="https://github.com/Tanmaysarkar2002" target="_blank" rel="noopener">GitHub</a>
+          <a class="btn" href="https://drive.google.com/file/d/1gTwUldj4om09PPkzUUjL5wSXbaeYlcZ5/view?usp=sharing" target="_blank" rel="noopener">Resume</a>
+        </div>
+        <button class="again" data-jump="0">↺ ride again</button>
+      </article>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="box" id="toast-box"></div>
+    <div><h4 id="toast-title">RIDER</h4><p id="toast-text"></p></div>
+  </div>
+
+  <div class="scroll-space" id="scroll-space"></div>
+
+  <noscript><style>.intro{display:none}.stage{position:static;height:auto}.cards{position:static}.cards .card{position:relative;inset:auto;opacity:1;transform:none;margin:24px auto;max-height:none}.rider,.speedo,.toast{display:none}</style></noscript>
+  <script src="ride/ride.js"></script>
 </body>
-
 </html>
