@@ -789,25 +789,26 @@
   function warningSign(lines, tag) {
     var h = 40 + lines.length * 26, w = 230, text = "";
     var longest = Math.max.apply(null, lines.map(function (l) { return l.length; }));
-    var fs = Math.min(21, Math.floor(196 / (longest * 0.62)));
-    lines.forEach(function (l, i) { text += '<text x="' + w / 2 + '" y="' + (34 + i * 26) + '" text-anchor="middle" ' + SKETCH + ' font-size="' + fs + '" fill="' + INK + '">' + l + "</text>"; });
+    var fs = Math.min(23, Math.floor(200 / (longest * 0.5)));
+    lines.forEach(function (l, i) { text += '<text x="' + w / 2 + '" y="' + (35 + i * 26) + '" text-anchor="middle" ' + HAND + ' font-size="' + fs + '" fill="' + INK + '" letter-spacing=".5">' + l + "</text>"; });
     return svg(w, h + 100,
       '<path d="M' + w / 2 + " " + h + " V" + (h + 100) + '" ' + S + ' stroke-width="6"/>' +
       '<rect x="4" y="4" width="' + (w - 8) + '" height="' + h + '" rx="8" fill="#ffd60a" ' + S + ' stroke-width="3"/>' +
       '<rect x="12" y="12" width="' + (w - 24) + '" height="' + (h - 16) + '" rx="5" fill="none" stroke="' + INK + '" stroke-width="1.6"/>' + text +
       '<text x="' + w / 2 + '" y="' + (h - 12) + '" text-anchor="middle" ' + HAND + ' font-size="12" fill="' + INK + '">' + (tag || "BRO") + "</text>");
   }
+  // Spaced so no two boards share the screen with a landmark crammed in between.
   var ROADSIDE = [
-    [950,   quoteBoard(["Not all those who", "wander are lost."], "J.R.R. Tolkien")],
+    [950,   warningSign(["LIFE IS SHORT", "DON'T MAKE IT SHORTER"])],
     [2650,  quoteBoard(["Arise, awake, and stop", "not till the goal", "is reached."], "Swami Vivekananda")],
-    [4600,  quoteBoard(["Simplicity is", "prerequisite for", "reliability."], "Edsger W. Dijkstra")],
-    [6000,  quoteBoard(["Talk is cheap.", "Show me the code."], "Linus Torvalds")],
-    [5700,  warningSign(["ROAD IS HILLY", "DON'T DRIVE SILLY"])],
+    [4600,  warningSign(["IF YOU LOVE HER", "DIVORCE SPEED"])],
+    [5650,  warningSign(["ROAD IS HILLY", "DON'T DRIVE SILLY"])],
+    [6380,  quoteBoard(["Talk is cheap.", "Show me the code."], "Linus Torvalds")],
     [7760,  warningSign(["PEEP PEEP", "DON'T SLEEP"])],
-    [8150,  quoteBoard(["Make it work,", "make it right,", "make it fast."], "Kent Beck")],
-    [9620,  warningSign(["BE GENTLE ON", "MY CURVES"], "BRO · HIMANK")],
+    [8500,  warningSign(["THIS IS A HIGHWAY", "NOT A RUNWAY"])],
+    [9560,  warningSign(["BE GENTLE ON", "MY CURVES"], "BRO · HIMANK")],
     [10930, warningSign(["WE CUT MOUNTAINS", "BUT CONNECT HEARTS"], "BRO · HIMANK")],
-    [11250, quoteBoard(["Life is like riding a", "bicycle. To keep your", "balance, you must", "keep moving."], "Albert Einstein")]
+    [11420, quoteBoard(["Life is like riding a", "bicycle. To keep your", "balance, you must", "keep moving."], "Albert Einstein")]
   ];
 
   var LAMP_XS = [];
@@ -1016,12 +1017,16 @@
 
   // Pause for a few seconds and the rider starts thinking out loud.
   var THOUGHTS = [
-    ["The journey of a thousand miles begins with a single step.", "Lao Tzu"],
-    ["Dream is not that which you see while sleeping, it is something that does not let you sleep.", "A.P.J. Abdul Kalam"],
-    ["Any fool can write code that a computer can understand. Good programmers write code that humans can understand.", "Martin Fowler"],
-    ["Premature optimization is the root of all evil.", "Donald Knuth"],
     ["Better Mr. Late than late Mr.", "BRO road sign"],
-    ["Life is short, don't make it shorter.", "BRO road sign"]
+    ["The journey of a thousand miles begins with a single step.", "Lao Tzu"],
+    ["Speed thrills but often kills.", "BRO road sign"],
+    ["Dream is not that which you see while sleeping, it is something that does not let you sleep.", "A.P.J. Abdul Kalam"],
+    ["All will wait, better be late.", "BRO road sign"],
+    ["Drive like hell and you will be there.", "BRO road sign"],
+    ["Don't gossip, let him drive.", "BRO road sign"],
+    ["I am curvaceous, be slow.", "BRO road sign"],
+    ["Darling I like you, but not so fast.", "BRO road sign"],
+    ["Safety on road is safe tea at home.", "BRO road sign"]
   ];
   var thoughtEl = document.createElement("div"), thoughtI = 0, idleSince = 0, thinking = false;
   thoughtEl.className = "thought";
@@ -1143,6 +1148,79 @@
   }
 
   // ------------------------------------------------------------------
+  // Oncoming traffic: autos, buses, trucks and fellow riders
+  // ------------------------------------------------------------------
+  var WHEEL = function (cx, cy, r) {
+    return '<g class="w" style="transform-origin:' + cx + "px " + cy + 'px"><circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#1f1f24"/>' +
+      '<path d="M' + (cx - r + 3) + " " + cy + " H" + (cx + r - 3) + " M" + cx + " " + (cy - r + 3) + " V" + (cy + r - 3) + '" stroke="#fbfaf6" stroke-width="2"/></g>';
+  };
+  var VEHICLES = {
+    auto: { w: 140, speed: 240, svg: "<svg viewBox=\"0 0 140 100\" width=\"140\" height=\"100\">\n        <g filter=\"url(#rough)\" stroke=\"#1f1f24\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\">\n          <path d=\"M34 10 Q78 -2 124 10 L126 50 L34 50 Z\" fill=\"#2b2d42\"/>\n          <path d=\"M34 10 Q78 -2 124 10\" fill=\"none\" stroke=\"#ffd166\" stroke-width=\"4\"/>\n          <path d=\"M14 80 L20 40 Q24 26 36 24 L36 80 Z\" fill=\"#ffd166\"/>\n          <rect x=\"36\" y=\"50\" width=\"92\" height=\"30\" rx=\"4\" fill=\"#7cc36a\"/>\n          <path d=\"M24 40 L32 26 L36 26 L36 50 L26 50 Z\" fill=\"#fbfaf6\"/>\n          <path d=\"M60 50 V22 M100 50 V18\" fill=\"none\"/>\n          <circle cx=\"56\" cy=\"36\" r=\"6\" fill=\"#e8c99a\"/>\n          <circle cx=\"18\" cy=\"58\" r=\"4.5\" fill=\"#fff6d8\"/>\n          <path d=\"M40 62 H120\" stroke-width=\"1.4\" fill=\"none\"/>\n        </g>\n        <g class=\"w\" style=\"transform-origin:28px 84px\"><circle cx=\"28\" cy=\"84\" r=\"11\" fill=\"#1f1f24\"/><path d=\"M20 84 H36 M28 76 V92\" stroke=\"#fbfaf6\" stroke-width=\"2\"/></g>\n        <g class=\"w\" style=\"transform-origin:108px 84px\"><circle cx=\"108\" cy=\"84\" r=\"13\" fill=\"#1f1f24\"/><path d=\"M98 84 H118 M108 74 V94\" stroke=\"#fbfaf6\" stroke-width=\"2\"/></g>\n      </svg>" },
+    bus: { w: 270, speed: 300, svg: '<svg viewBox="0 0 270 120" width="270" height="120"><g filter="url(#rough)" stroke="#1f1f24" stroke-width="2.4" stroke-linejoin="round">' +
+      '<path d="M10 100 V34 Q10 14 32 12 H258 V100 Z" fill="#f6e7c8"/><path d="M10 72 H258 V100 H10 Z" fill="#c1121f"/>' +
+      '<path d="M16 64 V36 Q16 22 34 20 H48 V64 Z" fill="#cfe6f5"/>' +
+      grid(58, 24, 7, 1, 28, 0, 22, 30, 'fill="#cfe6f5"') +
+      '<rect x="40" y="2" width="80" height="12" rx="2" fill="#1f1f24"/>' +
+      '<path d="M10 80 H258" stroke-width="1.4"/><circle cx="16" cy="88" r="5" fill="#fff6d8"/>' +
+      '<rect x="104" y="76" width="112" height="18" rx="3" fill="#fbfaf6" stroke-width="1.6"/></g>' +
+      '<text x="80" y="11.5" text-anchor="middle" font-family="Patrick Hand, cursive" font-size="10" fill="#ffd166">EXPRESS</text>' +
+      '<text x="160" y="89.5" text-anchor="middle" font-family="Patrick Hand, cursive" font-size="11.5" fill="#1f1f24">STATE TRANSPORT</text>' +
+      WHEEL(56, 104, 15) + WHEEL(214, 104, 15) + "</svg>" },
+    truck: { w: 250, speed: 220, svg: '<svg viewBox="0 0 250 120" width="250" height="120"><g filter="url(#rough)" stroke="#1f1f24" stroke-width="2.4" stroke-linejoin="round">' +
+      '<path d="M8 100 V52 L20 34 H62 V100 Z" fill="#2a9d8f"/><path d="M14 54 L24 40 H54 V58 H14 Z" fill="#cfe6f5"/>' +
+      '<rect x="62" y="16" width="180" height="84" rx="4" fill="#ffe08a"/>' +
+      '<path d="M62 26 H242 M62 90 H242" stroke-width="1.6"/><circle cx="12" cy="88" r="5" fill="#fff6d8"/></g>' +
+      '<g stroke="#1f1f24" stroke-width="1">' + [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(function (i) {
+        return '<path d="M' + (64 + i * 12) + ' 16 l6 9 l6 -9" fill="' + ["#e63946", "#3a86ff", "#2a9d8f"][i % 3] + '"/>';
+      }).join("") + "</g>" +
+      '<text x="152" y="52" text-anchor="middle" font-family="Cabin Sketch, cursive" font-weight="700" font-size="17" fill="#e63946">HORN OK PLEASE</text>' +
+      '<text x="152" y="74" text-anchor="middle" font-family="Patrick Hand, cursive" font-size="13" fill="#1f1f24">use dipper at night</text>' +
+      WHEEL(36, 104, 14) + WHEEL(170, 104, 14) + WHEEL(206, 104, 14) + "</svg>" },
+    biker: { w: 150, speed: 380, svg: '<svg viewBox="0 0 150 120" width="150" height="120">' +
+      '<g filter="url(#rough)" stroke="#1f1f24" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">' +
+      '<path d="M90 84 L136 78 L140 84 L92 90 Z" fill="#e6e8eb"/>' +
+      '<path d="M32 94 L52 50 M118 94 L96 70 L62 66 L52 50" fill="none" stroke-width="4.5"/>' +
+      '<rect x="60" y="64" width="32" height="22" rx="5" fill="#9aa0a8"/>' +
+      '<path d="M54 54 Q70 40 92 46 L94 58 Q74 62 56 60 Z" fill="#2a4fb5"/>' +
+      '<path d="M92 50 Q110 46 124 54 L122 60 L94 60 Z" fill="#3b2a20"/>' +
+      '<circle cx="44" cy="52" r="7" fill="#fff6d8"/><path d="M50 44 L58 40" stroke-width="4"/>' +
+      '<path d="M102 52 L80 64 L86 84" fill="none" stroke="#3a4a6b" stroke-width="8"/>' +
+      '<path d="M102 52 L88 26" fill="none" stroke="#2f3a55" stroke-width="15"/>' +
+      '<path d="M88 30 L66 40 L56 42" fill="none" stroke="#2f3a55" stroke-width="6"/>' +
+      '<circle cx="84" cy="12" r="11" fill="#2a9d8f"/><path d="M74 13 h10" stroke-width="3"/></g>' +
+      '<g class="wave-hand"><path d="M88 28 L102 12 L105 -2" fill="none" stroke="#2f3a55" stroke-width="6" stroke-linecap="round"/><circle cx="105" cy="-5" r="4.2" fill="#e0a982" stroke="#1f1f24" stroke-width="1.6"/></g>' +
+      WHEEL(32, 94, 20) + WHEEL(118, 94, 20) + "</svg>" }
+  };
+  var trafficEl = $("#traffic"), TYPES = Object.keys(VEHICLES);
+  var traffic = [0, 1].map(function (i) {
+    var el = document.createElement("div");
+    el.className = "vehicle";
+    trafficEl.appendChild(el);
+    return { el: el, x: 2600 + i * 3200, type: null, bubble: null };
+  });
+  function setVehicle(v, type) {
+    v.type = type;
+    v.el.innerHTML = VEHICLES[type].svg + (type === "biker" ? '<div class="bubble">Ride safe!</div>' : "");
+    v.bubble = v.el.querySelector(".bubble");
+  }
+  traffic.forEach(function (v, i) { setVehicle(v, i ? "bus" : "auto"); });
+  function updateTraffic(dt, camX, vw, rs, mobile) {
+    traffic.forEach(function (v, i) {
+      v.x -= VEHICLES[v.type].speed * dt;
+      var sx = v.x - camX;
+      if (sx < -320 || sx > vw + 4200) {
+        var other = traffic[1 - i], type;
+        do { type = TYPES[Math.floor(Math.random() * TYPES.length)]; } while (type === other.type);
+        setVehicle(v, type);
+        v.x = Math.max(camX + vw + 400 + Math.random() * 2200, other.x + 1800);
+        sx = v.x - camX;
+      }
+      v.el.style.transform = "translate3d(" + sx.toFixed(1) + "px,0,0) scale(" + (mobile ? 0.62 : 1) + ")";
+      if (v.bubble) v.bubble.classList.toggle("show", sx > rs + 120 && sx < rs + 520);
+    });
+  }
+
+  // ------------------------------------------------------------------
   // HUD: route + panels + controls
   // ------------------------------------------------------------------
   var route = $(".route"), fill = $(".route-fill"), routeBike = $(".route-bike"), dots = [];
@@ -1211,7 +1289,7 @@
   var beam = $("#beam"), speedlines = $("#speedlines");
   var posters = [].slice.call(document.querySelectorAll(".poster"));
   var cur = 0, last = performance.now(), dist = 0, lastNight = -1, lastActive = null;
-  var autoEl = $("#auto"), autoX = 2600, cowBubble = null, regionGroups = [];
+  var cowBubble = null, regionGroups = [];
   var speed = 0, prevSpeed = 0, wheelie = 0, clock = 0, lastRs = null;
 
   function frame(now) {
@@ -1269,11 +1347,8 @@
     engineSound(kmh, gearFrac);
     if (kmh >= 60) unlock("speed");
 
-    // Oncoming auto-rickshaw in the far lane.
-    autoX -= 240 * dt;
-    var autoScreen = autoX - camX;
-    if (autoScreen < -260 || autoScreen > vw + 2600) { autoX = camX + vw + 300 + Math.random() * 1800; autoScreen = autoX - camX; }
-    autoEl.style.transform = "translate3d(" + autoScreen.toFixed(1) + "px,0,0) scale(" + (mobile ? 0.65 : 1) + ")";
+    // Oncoming traffic in the far lane.
+    updateTraffic(dt, camX, vw, rs, mobile);
     if (cowBubble) cowBubble.classList.toggle("show", Math.abs(cur - (COW_X - 480)) < 260);
 
     regionGroups.forEach(function (g) { g.el.classList.toggle("off", cur < g.from || cur > g.to); });
@@ -1348,6 +1423,11 @@
     if (isMobile() !== wasMobile) { wasMobile = isMobile(); buildGlow(); }
   });
   setSound(false);
+  // Tab title nudges you back while you're away.
+  var baseTitle = document.title;
+  document.addEventListener("visibilitychange", function () {
+    document.title = document.hidden ? "🏍️ Engine's still running…" : baseTitle;
+  });
   // ------------------------------------------------------------------
   // Intro: "Why a motorbike?" + fuel-gauge loader, then kick-start.
   // ------------------------------------------------------------------

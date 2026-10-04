@@ -287,9 +287,13 @@ button { font: inherit; color: inherit; }
 .flock path:nth-child(2n) { animation-delay: -.25s; }
 @keyframes flapw { to { transform: scaleY(-.5); } }
 @keyframes fly { from { transform: translateX(110vw); } to { transform: translateX(-30vw) translateY(-40px); } }
-.auto { position: absolute; left: 0; bottom: calc(var(--road-h) - 22px); z-index: 3; transform-origin: bottom left; will-change: transform; pointer-events: none; }
-.auto svg { display: block; overflow: visible; }
-.auto .w { animation: spin .5s linear infinite reverse; }
+.vehicle { position: absolute; left: 0; bottom: calc(var(--road-h) - 22px); z-index: 3; transform-origin: bottom left; will-change: transform; pointer-events: none; }
+.vehicle svg { display: block; overflow: visible; }
+.vehicle .w { animation: spin .5s linear infinite reverse; }
+.vehicle .bubble { position: absolute; left: 10px; top: -34px; font: 18px var(--sketch); background: var(--paper-2); border: 2px solid var(--ink); border-radius: 14px 14px 14px 2px; padding: 0 10px; white-space: nowrap; opacity: 0; transform: scale(.6); transition: .25s; }
+.vehicle .bubble.show { opacity: 1; transform: rotate(-5deg); }
+.wave-hand { transform-box: view-box; transform-origin: 88px 28px; animation: wavehand .5s ease-in-out infinite alternate; }
+@keyframes wavehand { from { transform: rotate(-12deg); } to { transform: rotate(14deg); } }
 #front { bottom: -4px; z-index: 5; pointer-events: none; }
 .haze { position: absolute; inset: 0; z-index: 3; pointer-events: none; transition: background .4s; }
 .weather { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
@@ -329,6 +333,6 @@ button { font: inherit; color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .card { transition: opacity .2s; }
-  .stars span, .doodles span, .sun svg, .speedlines i, #glow .bulb, .blades, .kite, .bob, .balloon, .flag, .fire, .plane, .led, .wave, .cap, .tail, .flock, .flock path, .auto .w { animation: none; }
+  .stars span, .doodles span, .sun svg, .speedlines i, #glow .bulb, .blades, .kite, .bob, .balloon, .flag, .fire, .plane, .led, .wave, .cap, .tail, .flock, .flock path, .vehicle .w, .wave-hand { animation: none; }
   .rider .scarf { animation: none; }
 }
