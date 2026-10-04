@@ -78,9 +78,10 @@
     }
     return { wash: SKY[SKY.length - 1].wash, night: 1 };
   }
-  function svg(w, h, inner, rough) {
+  // `live` content sits outside the rough filter so animating it doesn't re-filter the whole layer.
+  function svg(w, h, inner, rough, live) {
     return '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + " " + h + '">' +
-      (rough === false ? inner : '<g filter="url(#rough)">' + inner + "</g>") + "</svg>";
+      (rough === false ? inner : '<g filter="url(#rough)">' + inner + "</g>") + (live || "") + "</svg>";
   }
   function ridge(width, height, step, base, amp, seed) {
     var r = rng(seed), d = "M0 " + height, y = base;
@@ -122,68 +123,308 @@
   function layerWidth(f) { return Math.ceil((END + OFFSET) * f + 2800); }
   function layerU(worldX, f, lead) { return Math.round((worldX + lead + OFFSET) * f); }
 
+  // Rough region of the journey for a given world x — scenery changes with it.
+  function region(wx) {
+    return wx < 2300 ? "bengal" : wx < 4000 ? "gwalior" : wx < 5900 ? "pune" : wx < 7700 ? "jaipur" : wx < 9500 ? "highway" : "city";
+  }
+  // Layer coordinate -> the world x the rider is at when it passes mid-screen.
+  function worldAt(u, f) { return (u - 520) / f - OFFSET + 190; }
+  function uAt(worldX, f, screenX) { return Math.round((worldX + OFFSET - 190) * f + (screenX || 520)); }
+
+  // Smooth hand-drawn ridge. profile(wx) gives the target height per region.
+  function smoothRidge(width, height, step, f, profile, amp, seed) {
+    var r = rng(seed), pts = [], y = profile(worldAt(0, f));
+    for (var x = -step; x <= width + step * 2; x += step) {
+      y += (profile(worldAt(x, f)) - y) * 0.35 + (r() - 0.5) * amp;
+      y = Math.max(12, Math.min(height - 8, y));
+      pts.push([x, Math.round(height - y)]);
+    }
+    var line = "M" + pts[0][0] + " " + pts[0][1];
+    for (var i = 1; i < pts.length; i++) {
+      line += " Q" + pts[i - 1][0] + " " + pts[i - 1][1] + " " + (pts[i - 1][0] + pts[i][0]) / 2 + " " + (pts[i - 1][1] + pts[i][1]) / 2;
+    }
+    var last = pts[pts.length - 1][0];
+    return { line: line, area: "M" + pts[0][0] + " " + height + " L" + line.slice(1) + " L" + last + " " + height + " Z", pts: pts, step: step };
+  }
+  function ridgeY(rd, u) {
+    var i = Math.max(0, Math.min(rd.pts.length - 2, Math.floor((u + rd.step) / rd.step)));
+    var a = rd.pts[i], b = rd.pts[i + 1], t = (u - a[0]) / (b[0] - a[0]);
+    return a[1] + (b[1] - a[1]) * Math.max(0, Math.min(1, t));
+  }
+  function ridgeArt(rd, fill, hatch) {
+    return '<path d="' + rd.area + '" fill="' + fill + '"/>' +
+      (hatch ? '<path d="' + rd.area + '" fill="url(#' + hatch + ')"/>' : "") +
+      '<path d="' + rd.line + '" fill="none" stroke="' + INK + '" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<path d="' + rd.line + '" transform="translate(0 16)" fill="none" stroke="' + INK + '" stroke-width="1.1" stroke-dasharray="14 10 4 10" opacity=".35"/>';
+  }
+
   function buildClouds() {
     var w = layerWidth(0.08), r = rng(7), s = "";
     for (var i = 0; i < 22; i++) {
       var x = r() * w, y = 50 + r() * 200, k = 0.5 + r() * 0.7;
       s += '<g transform="translate(' + x.toFixed(0) + " " + y.toFixed(0) + ") scale(" + k.toFixed(2) + ')">' +
         puffs([[-40, 8, 24], [-12, -6, 30], [22, -2, 26], [48, 10, 18], [6, 14, 22]]) +
-        '<path d="M-60 30 H66" stroke="' + INK + '" stroke-width="2" opacity=".35"/></g>';
+        '<path d="M-44 22 q10 6 22 2 M4 26 q14 4 30 -2" stroke="' + INK + '" stroke-width="1.6" fill="none" opacity=".4"/>' +
+        '<path d="M-60 32 H66" stroke="' + INK + '" stroke-width="2" opacity=".3"/></g>';
     }
-    $("#clouds").innerHTML = svg(w, 300, s);
+    var balloons = "";
+    [[uAt(800, 0.08, 1100), 200, "#ff6b35"], [uAt(4400, 0.08, 1150), 160, "#3a86ff"], [uAt(7600, 0.08, 1100), 230, "#e63946"]].forEach(function (b, i) {
+      balloons += '<g class="balloon" style="animation-delay:-' + i * 2 + 's"><g transform="translate(' + b[0] + " " + b[1] + ')">' +
+        '<path d="M0 0 C-34 0 -40 -50 0 -62 C40 -50 34 0 0 0 Z" fill="' + b[2] + '" stroke="' + INK + '" stroke-width="2.2"/>' +
+        '<path d="M0 0 C-14 -10 -16 -48 0 -62 C16 -48 14 -10 0 0" fill="' + PAPER + '" stroke="' + INK + '" stroke-width="1.6"/>' +
+        '<path d="M-10 2 L-7 18 M10 2 L7 18" stroke="' + INK + '" stroke-width="1.4"/>' +
+        '<rect x="-9" y="18" width="18" height="13" rx="2" fill="#c8a46a" stroke="' + INK + '" stroke-width="1.8"/></g></g>';
+    });
+    $("#clouds").innerHTML = svg(w, 300, s, true, balloons);
   }
+
+  var HEIGHTS_FAR = { bengal: 100, gwalior: 180, pune: 300, jaipur: 140, highway: 170, city: 160 };
+  var HEIGHTS_MID = { bengal: 40, gwalior: 100, pune: 180, jaipur: 70, highway: 80, city: 60 };
 
   function buildFar() {
-    var w = layerWidth(0.15), d = ridge(w, 280, 70, 160, 80, 11);
-    $("#far").innerHTML = svg(w, 280,
-      '<path d="' + d + '" fill="' + PAPER + '"/><path d="' + d + '" fill="url(#hatch-light)" stroke="' + INK + '" stroke-width="1.8" stroke-linejoin="round"/>');
+    var f = 0.15, w = layerWidth(f);
+    var rd = smoothRidge(w, 380, 60, f, function (wx) { return HEIGHTS_FAR[region(wx)]; }, 40, 11);
+    $("#far").innerHTML = svg(w, 380, ridgeArt(rd, PAPER, "hatch-light"));
   }
 
+  // --- mid-layer set pieces -------------------------------------------------
   function fort(x, y, scale) {
+    var d = "M-20 92 h170 v-30 h-10 v-10 h-8 v10 h-12 v-26 h-14 v26 h-30 v-34 a14 14 0 0 0 -28 0 v34 h-20 v-20 h-12 v20 h-16 v-14 h-10 z";
     return '<g transform="translate(' + x + " " + y + ") scale(" + scale + ')">' +
-      '<path d="M-20 92 h170 v-30 h-10 v-10 h-8 v10 h-12 v-26 h-14 v26 h-30 v-34 a14 14 0 0 0 -28 0 v34 h-20 v-20 h-12 v20 h-16 v-14 h-10 z" fill="' + PAPER + '" ' + S + "/>" +
-      '<path d="M-20 92 h170 v-30 h-10 v-10 h-8 v10 h-12 v-26 h-14 v26 h-30 v-34 a14 14 0 0 0 -28 0 v34 h-20 v-20 h-12 v20 h-16 v-14 h-10 z" fill="url(#bricks)"/>' +
-      grid(0, 72, 6, 1, 24, 0, 6, 10, 'fill="' + INK + '"') + "</g>";
+      '<path d="' + d + '" fill="' + PAPER + '" ' + S + '/><path d="' + d + '" fill="url(#bricks)"/>' +
+      grid(0, 72, 6, 1, 24, 0, 6, 10, 'fill="' + INK + '"') +
+      '<path d="M40 0 V-26 l16 6 l-16 6" fill="' + ACCENT + '" ' + S + ' stroke-width="1.6"/></g>';
   }
-  function waterTanks(x, seed) {
+  function waterTanks(x, seed, base) {
     var r = rng(seed), s = "";
     for (var i = 0; i < 9; i++) {
       var bx = x + i * 70 + r() * 20, h = 50 + r() * 70, w = 50 + r() * 26;
-      s += '<rect x="' + bx + '" y="' + (180 - h) + '" width="' + w + '" height="' + h + '" fill="' + PAPER + '" ' + S + ' stroke-width="2"/>' +
-        grid(bx + 8, 190 - h, 2, Math.floor(h / 26), 22, 24, 10, 10, 'fill="url(#hatch)"');
-      if (r() < 0.6) { // black Sintex-style water tank
-        var tx = bx + w / 2 - 12;
-        s += '<path d="M' + tx + " " + (180 - h) + " v-20 q12 -10 24 0 v20 z" + '" fill="' + INK + '"/>';
-      }
-      if (r() < 0.4) s += '<path d="M' + (bx + w - 10) + " " + (180 - h) + " v-30 m-8 6 h16 m-12 8 h8" + '" ' + S + ' stroke-width="1.6" fill="none"/>';
+      s += '<rect x="' + bx + '" y="' + (base - h) + '" width="' + w + '" height="' + h + '" fill="' + ["#fbfaf6", "#f6dccb", "#dfe9f5", "#f3e6c4"][i % 4] + '" ' + S + ' stroke-width="2"/>' +
+        grid(bx + 8, base + 10 - h, 2, Math.floor(h / 26), 22, 24, 10, 10, 'fill="url(#hatch)"');
+      if (r() < 0.6) s += '<path d="M' + (bx + w / 2 - 12) + " " + (base - h) + ' v-20 q12 -10 24 0 v20 z" fill="' + INK + '"/>';
+      if (r() < 0.4) s += '<path d="M' + (bx + w - 10) + " " + (base - h) + ' v-30 m-8 6 h16 m-12 8 h8" ' + S + ' stroke-width="1.6" fill="none"/>';
+      if (r() < 0.3) s += '<path d="M' + (bx + 4) + " " + (base - h + 14) + " q" + w / 2 + " 10 " + (w - 8) + ' 0" stroke="' + INK + '" stroke-width="1.2" fill="none"/>' +
+        '<rect x="' + (bx + 10) + '" y="' + (base - h + 17) + '" width="8" height="10" fill="' + ACCENT + '"/><rect x="' + (bx + 24) + '" y="' + (base - h + 19) + '" width="8" height="9" fill="#3a86ff"/>';
     }
     return s;
   }
+  function mesa(x, b, w, h) {
+    var d = "M" + x + " " + b + " L" + (x + w * 0.18) + " " + (b - h) + " H" + (x + w * 0.82) + " L" + (x + w) + " " + b + " Z";
+    return '<path d="' + d + '" fill="#f2e2cc" ' + S + '/><path d="' + d + '" fill="url(#hatch-light)"/>' +
+      '<path d="M' + (x + w * 0.22) + " " + (b - h * 0.6) + " H" + (x + w * 0.78) + " M" + (x + w * 0.12) + " " + (b - h * 0.3) + " H" + (x + w * 0.88) + '" stroke="' + INK + '" stroke-width="1.2" opacity=".5"/>';
+  }
+  function waterfall(x, top, b) {
+    var lines = "";
+    for (var i = 0; i < 4; i++) lines += '<path d="M' + (x + 4 + i * 6) + " " + top + " q4 " + (b - top) / 3 + " -2 " + (b - top) / 1.6 + " t2 " + (b - top) / 2.6 + '" stroke="#5aa9e6" stroke-width="1.6" fill="none"/>';
+    return '<path d="M' + x + " " + top + " h28 l6 " + (b - top) + " h-40 z" + '" fill="#e6f2fb"/>' + lines +
+      puffs([[x + 2, b - 4, 9], [x + 16, b - 8, 11], [x + 30, b - 3, 9]], "#f4f9fd");
+  }
+  function windmill(x, b, k, dur) {
+    var hx = x, hy = b - 130 * k, blades = "";
+    for (var i = 0; i < 3; i++) blades += '<path d="M' + hx + " " + hy + " l" + (-4 * k) + " " + (-48 * k) + " q" + 4 * k + " " + -6 * k + " " + 8 * k + ' 0 z" fill="' + PAPER + '" ' + S + ' stroke-width="1.6" transform="rotate(' + i * 120 + " " + hx + " " + hy + ')"/>';
+    return {
+      art: '<path d="M' + (x - 5 * k) + " " + b + " L" + (x - 2 * k) + " " + hy + " H" + (x + 2 * k) + " L" + (x + 5 * k) + " " + b + ' Z" fill="' + PAPER + '" ' + S + ' stroke-width="1.8"/>',
+      live: '<g class="blades" style="transform-origin:' + hx + "px " + hy + "px;animation-duration:" + dur + 's">' + blades +
+        '<circle cx="' + hx + '" cy="' + hy + '" r="' + 4 * k + '" fill="' + INK + '"/></g>'
+    };
+  }
+  function truck(x, b) {
+    var tri = "";
+    for (var i = 0; i < 9; i++) tri += '<path d="M' + (x + 4 + i * 11) + " " + (b - 70) + " l5.5 8 l5.5 -8" + '" fill="' + ["#e63946", "#ffd166", "#3a86ff"][i % 3] + '" stroke="' + INK + '" stroke-width="1"/>';
+    return '<rect x="' + x + '" y="' + (b - 72) + '" width="104" height="54" rx="4" fill="#ffe08a" ' + S + "/>" + tri +
+      '<text x="' + (x + 52) + '" y="' + (b - 38) + '" text-anchor="middle" ' + SKETCH + ' font-size="12" fill="#e63946">HORN OK</text>' +
+      '<text x="' + (x + 52) + '" y="' + (b - 25) + '" text-anchor="middle" ' + SKETCH + ' font-size="12" fill="#2a9d8f">PLEASE</text>' +
+      '<path d="M' + (x + 104) + " " + (b - 18) + " V" + (b - 58) + " h22 l12 18 v22 z" + '" fill="#2a9d8f" ' + S + "/>" +
+      '<path d="M' + (x + 110) + " " + (b - 52) + ' h14 l8 12 h-22 z" fill="' + PAPER + '" ' + S + ' stroke-width="1.5"/>' +
+      '<circle cx="' + (x + 24) + '" cy="' + (b - 12) + '" r="11" fill="' + INK + '"/><circle cx="' + (x + 118) + '" cy="' + (b - 12) + '" r="11" fill="' + INK + '"/>' +
+      '<circle cx="' + (x + 24) + '" cy="' + (b - 12) + '" r="4" fill="' + PAPER + '"/><circle cx="' + (x + 118) + '" cy="' + (b - 12) + '" r="4" fill="' + PAPER + '"/>';
+  }
+  function boat(x, y) {
+    return '<g class="bob" transform="translate(' + x + " " + y + ')">' +
+      '<path d="M0 0 h70 q-6 14 -18 16 h-34 q-12 -2 -18 -16 z" fill="#c8a46a" ' + S + ' stroke-width="2"/>' +
+      '<path d="M30 0 v-24 M30 -18 l-8 10 M30 -18 l10 6 l14 -22" ' + S + ' stroke-width="2" fill="none"/><circle cx="30" cy="-29" r="5" fill="' + PAPER + '" ' + S + ' stroke-width="1.8"/>' +
+      '<path d="M22 -33 h16 l-8 -6 z" fill="#ffd166" ' + S + ' stroke-width="1.4"/>' +
+      '<path d="M54 -22 l26 40" stroke="' + INK + '" stroke-width="1.4"/></g>';
+  }
+  function kite(x, top, b, color, delay) {
+    return '<g class="kite" style="transform-origin:' + (x - 40) + "px " + b + "px;animation-delay:" + delay + 's">' +
+      '<path d="M' + (x - 40) + " " + b + " Q" + (x - 50) + " " + (top + (b - top) * 0.5) + " " + x + " " + (top + 16) + '" stroke="' + INK + '" stroke-width="1" fill="none" opacity=".6"/>' +
+      '<path d="M' + x + " " + top + " l14 16 l-14 18 l-14 -18 z" + '" fill="' + color + '" ' + S + ' stroke-width="1.6"/>' +
+      '<path d="M' + x + " " + top + " v34 M" + (x - 14) + " " + (top + 16) + " h28" + '" stroke="' + INK + '" stroke-width="1"/>' +
+      '<path d="M' + x + " " + (top + 34) + " q6 8 0 14 q-6 6 2 12" + '" stroke="' + INK + '" stroke-width="1.4" fill="none"/></g>';
+  }
+  function dunes(x0, x1, b) {
+    var s = "";
+    for (var x = x0; x < x1; x += 140) s += '<path d="M' + x + " " + b + " q60 -34 120 -6 q20 6 40 6" + '" stroke="' + INK + '" stroke-width="1.4" fill="#f6e3c3"/>';
+    return s;
+  }
+
   function buildMid() {
-    var f = 0.35, w = layerWidth(f), d = ridge(w, 200, 55, 60, 34, 23);
-    var s = '<path d="' + d + '" fill="' + PAPER + '" ' + S + ' stroke-width="2"/>';
-    s += fort(layerU(CHECKPOINTS[2].x, f, 1300), 50, 1);              // Gwalior Fort
-    s += fort(layerU(CHECKPOINTS[4].x, f, 1500), 66, 0.8);            // Amber Fort, Jaipur
-    s += waterTanks(layerU(CHECKPOINTS[3].x, f, 700), 5);             // Pune rooftops
-    s += waterTanks(layerU(CHECKPOINTS[6].x, f, 600), 9);             // rooftops behind the washing line
-    $("#mid").innerHTML = svg(w, 200, s);
+    var f = 0.5, w = layerWidth(f), H = 260, art = "", live = "";
+    var rd = smoothRidge(w, H, 50, f, function (wx) { return HEIGHTS_MID[region(wx)]; }, 18, 23);
+    art += ridgeArt(rd, PAPER);
+    // Bengal: river with a fishing boat, paddy rows.
+    var b0 = uAt(-800, f, 0), b1 = uAt(2300, f, 900);
+    art += '<path d="M' + b0 + " " + (H - 14) + " H" + b1 + " V" + H + " H" + b0 + ' Z" fill="#dcecf7"/>';
+    for (var rx = b0; rx < b1; rx += 46) art += '<path d="M' + rx + " " + (H - 8) + ' q8 -4 16 0" stroke="#5aa9e6" stroke-width="1.4" fill="none"/>';
+    live += boat(uAt(300, f, 1000), H - 16) + boat(uAt(1300, f, 1300), H - 14);
+    for (var px = uAt(-600, f, 200); px < uAt(2000, f, 400); px += 9) art += '<path d="M' + px + " " + (ridgeY(rd, px) + 10) + ' l2 -7 l2 7" stroke="#7aa35b" stroke-width="1.2" fill="none"/>';
+    // Gwalior: ravine mesas + the fort.
+    art += mesa(uAt(2300, f, 1500), H, 190, 56) + mesa(uAt(2900, f, 1700), H, 150, 44);
+    art += fort(uAt(CHECKPOINTS[2].x, f, 820), ridgeY(rd, uAt(CHECKPOINTS[2].x, f, 880)) - 84, 1);
+    // Pune: Western Ghats waterfall, then rooftops.
+    var wfx = uAt(4300, f, 1300), wtop = ridgeY(rd, wfx + 14);
+    art += waterfall(wfx, wtop, H);
+    art += waterTanks(uAt(CHECKPOINTS[3].x, f, 900), 5, H);
+    // Jaipur: dunes, Amber fort, kites.
+    art += dunes(uAt(5900, f, 1450), uAt(7400, f, 1450), H);
+    art += fort(uAt(CHECKPOINTS[4].x, f, 1100), ridgeY(rd, uAt(CHECKPOINTS[4].x, f, 1160)) - 70, 0.8);
+    [["#e63946", 5900, 1500, 20], ["#ffd166", 6200, 1600, 46], ["#3a86ff", 6600, 1500, 10], ["#2a9d8f", 7000, 1600, 34], ["#ff6b35", 9900, 1500, 24], ["#e63946", 10300, 1600, 8]].forEach(function (k, i) {
+      var kx = uAt(k[1], f, k[2]);
+      live += kite(kx, k[3], H - 60, k[0], (i * 0.7).toFixed(1));
+    });
+    // Highway: wind farm + a painted truck.
+    [[7700, 1500, 0.9, 5], [7900, 1700, 1.1, 6.5], [8500, 1550, 0.8, 4.2], [8900, 1700, 1, 5.6]].forEach(function (m) {
+      var mx = uAt(m[0], f, m[1]), wm = windmill(mx, ridgeY(rd, mx) + 4, m[2], m[3]);
+      art += wm.art; live += wm.live;
+    });
+    art += truck(uAt(8700, f, 1500), H);
+    // City rooftops behind the washing line.
+    art += waterTanks(uAt(CHECKPOINTS[6].x, f, 1000), 9, H);
+    $("#mid").innerHTML = svg(w, H, art, true, live);
+  }
+
+  // --- near-layer flora + power line ---------------------------------------
+  function trunk(x, b, top, k) {
+    return '<path d="M' + x + " " + b + " C" + (x - 2 * k) + " " + (b - 20 * k) + " " + (x + 3 * k) + " " + (top + 10 * k) + " " + x + " " + top +
+      " M" + x + " " + (top + 16 * k) + " l" + -12 * k + " " + -12 * k + " M" + x + " " + (top + 24 * k) + " l" + 10 * k + " " + -10 * k + '" ' + S + ' stroke-width="' + (2.6 * k).toFixed(1) + '" fill="none"/>';
+  }
+  function mango(x, b, k) {
+    var cy = b - 74 * k, s = trunk(x, b, cy + 18 * k, k) +
+      puffs([[x - 28 * k, cy + 8 * k, 22 * k], [x, cy - 12 * k, 30 * k], [x + 28 * k, cy + 6 * k, 23 * k], [x + 2 * k, cy + 14 * k, 22 * k]], "#eef3e2");
+    [[-24, 14], [-6, 2], [14, 18], [26, -2], [-14, -16], [8, -26]].forEach(function (o) {
+      s += '<ellipse cx="' + (x + o[0] * k) + '" cy="' + (cy + o[1] * k) + '" rx="' + 3.6 * k + '" ry="' + 4.8 * k + '" fill="#ffb627" stroke="' + INK + '" stroke-width="1"/>';
+    });
+    return s;
+  }
+  function banana(x, b, k) {
+    var top = b - 62 * k, s = '<path d="M' + x + " " + b + " Q" + (x + 4 * k) + " " + (b - 30 * k) + " " + x + " " + top + '" ' + S + ' stroke-width="' + 5 * k + '" fill="none"/>';
+    [[-1, -8], [1, -12], [-1, 6], [1, 4]].forEach(function (l) {
+      var dx = l[0] * 46 * k, dy = l[1] * k;
+      s += '<path d="M' + x + " " + top + " q" + dx * 0.5 + " " + (dy - 22 * k) + " " + dx + " " + (dy + 8 * k) + " q" + -dx * 0.6 + " " + -6 * k + " " + -dx + " " + (-dy - 8 * k) + '" fill="#cfe3b4" ' + S + ' stroke-width="1.6"/>';
+    });
+    return s;
+  }
+  function palm(x, b, k) {
+    var tx = x + 18 * k, ty = b - 110 * k, s = '<path d="M' + x + " " + b + " Q" + (x - 6 * k) + " " + (b - 60 * k) + " " + tx + " " + ty + '" ' + S + ' stroke-width="' + 5 * k + '" fill="none"/>';
+    for (var i = 1; i < 6; i++) s += '<path d="M' + (x - 4 * k + i * 2 * k) + " " + (b - i * 18 * k) + " h" + 9 * k + '" stroke="' + INK + '" stroke-width="1.2"/>';
+    [-150, -110, -60, -20, 20].forEach(function (a) {
+      var r = (a * Math.PI) / 180, ex = tx + Math.cos(r) * 46 * k, ey = ty + Math.sin(r) * 30 * k + 18 * k;
+      s += '<path d="M' + tx + " " + ty + " Q" + (tx + Math.cos(r) * 26 * k) + " " + (ty + Math.sin(r) * 30 * k - 14 * k) + " " + ex + " " + ey + '" stroke="' + INK + '" stroke-width="' + 2.4 * k + '" fill="none"/>' +
+        '<path d="M' + tx + " " + ty + " Q" + (tx + Math.cos(r) * 26 * k) + " " + (ty + Math.sin(r) * 30 * k - 8 * k) + " " + ex + " " + ey + '" stroke="#7aa35b" stroke-width="' + 5 * k + '" fill="none" opacity=".55"/>';
+    });
+    return s + '<circle cx="' + (tx - 4 * k) + '" cy="' + (ty + 6 * k) + '" r="' + 4 * k + '" fill="#8a6a43"/><circle cx="' + (tx + 4 * k) + '" cy="' + (ty + 7 * k) + '" r="' + 4 * k + '" fill="#8a6a43"/>';
+  }
+  function acacia(x, b, k) {
+    var top = b - 70 * k;
+    return '<path d="M' + x + " " + b + " L" + (x + 4 * k) + " " + (top + 26 * k) + " L" + (x - 14 * k) + " " + top + " M" + (x + 4 * k) + " " + (top + 26 * k) + " L" + (x + 22 * k) + " " + (top + 4 * k) + '" ' + S + ' stroke-width="' + 3 * k + '" fill="none"/>' +
+      '<path d="M' + (x - 54 * k) + " " + (top + 4 * k) + " q14 -22 " + 40 * k + " " + -16 * k + " q20 -16 " + 44 * k + " " + -4 * k + " q20 -2 " + 26 * k + " " + 20 * k + ' z" fill="#e3ead0" ' + S + ' stroke-width="2"/>' +
+      '<path d="M' + (x - 44 * k) + " " + (top + 2 * k) + " h" + 80 * k + '" stroke="' + INK + '" stroke-width="1" opacity=".5" stroke-dasharray="4 4"/>';
+  }
+  function roundTree(x, b, k) {
+    var cy = b - 70 * k, rr = 24 * k;
+    return trunk(x, b, cy + 16 * k, k) + puffs([[x - rr * 0.7, cy + 4, rr * 0.8], [x, cy - rr * 0.5, rr], [x + rr * 0.8, cy + 2, rr * 0.75]], "#e9f0dc") +
+      '<path d="M' + (x + rr * 0.2) + " " + (cy + rr * 0.6) + " q" + rr * 0.6 + " -2 " + rr * 0.9 + ' -10" stroke="' + INK + '" stroke-width="1.4" fill="none" opacity=".6"/>';
+  }
+  function pine(x, b, k) {
+    var h = 90 * k;
+    return '<path d="M' + x + " " + b + " l" + h * 0.3 + " " + -h + " l" + h * 0.3 + " " + h + 'z" fill="#e3ecd8" ' + S + ' stroke-width="2"/>' +
+      '<path d="M' + (x + h * 0.3) + " " + (b - h) + " l" + h * 0.3 + " " + h + " h" + -h * 0.3 + 'z" fill="url(#hatch)"/>';
+  }
+  function bush(x, b, k, fill) { return puffs([[x - 12 * k, b - 8 * k, 11 * k], [x + 4 * k, b - 14 * k, 14 * k], [x + 18 * k, b - 7 * k, 10 * k]], fill || "#e9f0dc"); }
+  function rock(x, b, k) {
+    var d = "M" + x + " " + b + " l" + 6 * k + " " + -18 * k + " l" + 18 * k + " " + -8 * k + " l" + 16 * k + " " + 10 * k + " l" + 6 * k + " " + 16 * k + " z";
+    return '<path d="' + d + '" fill="#efe9dc" ' + S + ' stroke-width="2"/><path d="' + d + '" fill="url(#hatch-light)"/>';
+  }
+  function camel(x, b) {
+    return '<g transform="translate(' + x + " " + (b - 86) + ')">' +
+      '<path d="M30 54 L28 86 M38 54 L41 86 M64 54 L62 86 M72 52 L76 86" ' + S + ' stroke-width="3" fill="none"/>' +
+      '<path d="M22 42 Q32 18 46 32 Q60 14 74 36 Q82 46 72 54 L30 56 Q18 52 22 42 Z" fill="#e8c99a" ' + S + "/>" +
+      '<path d="M40 30 q8 -4 16 4 l-4 14 h-14 z" fill="#e07a5f" stroke="' + INK + '" stroke-width="1.4"/>' +
+      '<path d="M26 44 Q10 34 10 20 L2 18 Q0 10 8 10 L16 12 Q20 30 32 40" fill="#e8c99a" ' + S + "/>" +
+      '<circle cx="7" cy="14" r="1.3" fill="' + INK + '"/><path d="M80 40 q6 6 3 14" ' + S + ' stroke-width="1.6" fill="none"/></g>';
+  }
+  function haystack(x, b, k) {
+    var d = "M" + x + " " + b + " q" + 4 * k + " " + -46 * k + " " + 26 * k + " " + -48 * k + " q" + 22 * k + " " + 2 * k + " " + 26 * k + " " + 48 * k + " z";
+    return '<path d="' + d + '" fill="#f3dc9b" ' + S + ' stroke-width="2"/><path d="' + d + '" fill="url(#hatch-light)"/>' +
+      '<path d="M' + (x + 26 * k) + " " + (b - 48 * k) + " v" + -12 * k + '" ' + S + ' stroke-width="2"/>';
+  }
+  function house(x, b, k, color) {
+    var w = 70 * k, h = 66 * k;
+    return '<rect x="' + x + '" y="' + (b - h) + '" width="' + w + '" height="' + h + '" fill="' + color + '" ' + S + ' stroke-width="2"/>' +
+      '<rect x="' + (x + 8 * k) + '" y="' + (b - h + 12 * k) + '" width="' + 16 * k + '" height="' + 14 * k + '" fill="' + PAPER + '" ' + S + ' stroke-width="1.6"/>' +
+      '<path d="M' + (x + 34 * k) + " " + (b - h + 30 * k) + " h" + 30 * k + " M" + (x + 36 * k) + " " + (b - h + 30 * k) + " v" + -12 * k + " M" + (x + 46 * k) + " " + (b - h + 30 * k) + " v" + -12 * k + " M" + (x + 56 * k) + " " + (b - h + 30 * k) + " v" + -12 * k + " M" + (x + 34 * k) + " " + (b - h + 18 * k) + " h" + 30 * k + '" stroke="' + INK + '" stroke-width="1.6"/>' +
+      '<rect x="' + (x + 40 * k) + '" y="' + (b - 26 * k) + '" width="' + 16 * k + '" height="' + 26 * k + '" fill="#8a6a43" ' + S + ' stroke-width="1.6"/>' +
+      '<path d="M' + (x - 4 * k) + " " + (b - h) + " h" + (w + 8 * k) + '" ' + S + ' stroke-width="3"/>';
   }
 
   function buildNear() {
-    var w = layerWidth(0.6), r = rng(42), s = "";
-    for (var x = 0; x < w; x += 110 + r() * 220) {
-      var h = 60 + r() * 60;
-      if (r() < 0.45) {
-        s += '<path d="M' + x + " 150 l" + h * 0.3 + " -" + h + " l" + h * 0.3 + " " + h + 'z" fill="' + PAPER + '" ' + S + ' stroke-width="2"/>' +
-          '<path d="M' + (x + h * 0.3) + " " + (150 - h) + " l" + h * 0.3 + " " + h + " h-" + h * 0.3 + 'z" fill="url(#hatch)"/>';
+    var f = 0.75, w = layerWidth(f), H = 200, b = H, r = rng(42), art = "", poles = "";
+    // Power line along the road, with a few birds sitting on it.
+    var tops = [];
+    for (var x = 40; x < w; x += 300) {
+      var py = b - 150;
+      poles += '<path d="M' + x + " " + b + " V" + py + " M" + (x - 16) + " " + (py + 8) + " H" + (x + 16) + '" ' + S + ' stroke-width="3" fill="none"/>' +
+        '<circle cx="' + (x - 12) + '" cy="' + (py + 5) + '" r="2.4" fill="' + INK + '"/><circle cx="' + (x + 12) + '" cy="' + (py + 5) + '" r="2.4" fill="' + INK + '"/>';
+      tops.push(x);
+    }
+    [-12, 12].forEach(function (off, wi) {
+      var d = "";
+      for (var i = 0; i < tops.length - 1; i++) {
+        var a = tops[i] + off, c = tops[i + 1] + off, y = b - 145;
+        d += (i ? " " : "M" + a + " " + y) + " Q" + (a + c) / 2 + " " + (y + 34) + " " + c + " " + y;
+        if (wi === 0 && r() < 0.18) {
+          for (var bi = 0; bi < 2 + Math.floor(r() * 3); bi++) {
+            var t = 0.3 + bi * 0.09, bx = a + (c - a) * t, by = y + 4 * 17 * t * (1 - t) - 4;
+            poles += '<g transform="translate(' + bx.toFixed(0) + " " + by.toFixed(0) + ')"><ellipse rx="5" ry="3.6" fill="' + INK + '"/><circle cx="4" cy="-3.4" r="2.6" fill="' + INK + '"/><path d="M-5 0 l-4 2" stroke="' + INK + '" stroke-width="1.6"/></g>';
+          }
+        }
+      }
+      poles += '<path d="' + d + '" stroke="' + INK + '" stroke-width="1.2" fill="none" opacity=".75"/>';
+    });
+    // Region flora.
+    var camelDone = false, truckDone = false;
+    for (x = 20; x < w; x += 90 + r() * 170) {
+      var reg = region(worldAt(x, f)), k = 0.95 + r() * 0.5, roll = r();
+      if (reg === "bengal") art += roll < 0.4 ? mango(x, b, k) : roll < 0.65 ? banana(x, b, k) : roll < 0.85 ? palm(x, b, k) : bush(x, b, k);
+      else if (reg === "gwalior") art += roll < 0.5 ? acacia(x, b, k) : roll < 0.75 ? rock(x, b, k) : bush(x, b, k, "#efe9dc");
+      else if (reg === "pune") art += roll < 0.45 ? roundTree(x, b, k * 1.1) : roll < 0.75 ? pine(x, b, k) : bush(x, b, k);
+      else if (reg === "jaipur") {
+        if (!camelDone && worldAt(x, f) > 6100) { art += camel(x, b); camelDone = true; x += 60; }
+        else art += roll < 0.4 ? acacia(x, b, k * 0.8) : roll < 0.7 ? rock(x, b, k * 0.8) : bush(x, b, k * 0.7, "#efe2c4");
+      }
+      else if (reg === "highway") art += roll < 0.4 ? haystack(x, b, k) : roll < 0.75 ? roundTree(x, b, k) : bush(x, b, k);
+      else art += roll < 0.6 ? house(x, b, k, ["#f6dccb", "#dfe9f5", "#f3e6c4", "#e3f0d9", "#f2d0e0"][Math.floor(r() * 5)]) : roundTree(x, b, k);
+    }
+    $("#near").innerHTML = svg(w, H, poles + art);
+  }
+
+  // Grass, flowers and pebbles that pass in front of the rider.
+  function buildFront() {
+    var f = 1.25, w = layerWidth(f), r = rng(77), s = "";
+    for (var x = 0; x < w; x += 40 + r() * 140) {
+      var roll = r();
+      if (roll < 0.55) {
+        s += '<path d="M' + x + " 44 q2 -18 -6 -26 M" + (x + 5) + " 44 q0 -22 6 -30 M" + (x + 10) + " 44 q4 -14 12 -18" + '" ' + S + ' stroke-width="2" fill="none"/>';
+      } else if (roll < 0.8) {
+        var c = ["#ff6b35", "#ffd166", "#e63946", "#b892ff"][Math.floor(r() * 4)];
+        s += '<path d="M' + x + " 44 q2 -14 0 -24" + '" ' + S + ' stroke-width="1.6" fill="none"/>' +
+          '<circle cx="' + x + '" cy="18" r="5" fill="' + c + '" ' + S + ' stroke-width="1.4"/><circle cx="' + x + '" cy="18" r="1.6" fill="' + INK + '"/>';
       } else {
-        var cx = x + 30, cy = 150 - h * 0.75, rr = h * 0.26;
-        s += '<path d="M' + cx + " 150 V" + (cy + rr * 0.6) + " M" + cx + " " + (cy + rr * 1.1) + " l-10 -12 M" + cx + " " + (cy + rr * 1.3) + ' l9 -10" ' + S + ' stroke-width="2.4" fill="none"/>' +
-          puffs([[cx - rr * 0.7, cy + 4, rr * 0.8], [cx, cy - rr * 0.5, rr], [cx + rr * 0.8, cy + 2, rr * 0.75]]) +
-          '<path d="M' + (cx + rr * 0.2) + " " + (cy + rr * 0.6) + " q" + rr * 0.6 + " -2 " + rr * 0.9 + ' -10" stroke="' + INK + '" stroke-width="1.4" fill="none" opacity=".6"/>';
+        s += '<ellipse cx="' + x + '" cy="40" rx="' + (8 + r() * 8).toFixed(0) + '" ry="5" fill="#efe9dc" ' + S + ' stroke-width="1.6"/>';
       }
     }
-    $("#near").innerHTML = svg(w, 150, s);
+    $("#front").innerHTML = svg(w, 46, s, false);
   }
 
   // Ground landmarks: [worldX, svg, extraHTML, className]
@@ -286,23 +527,52 @@
       '<rect x="160" y="250" width="200" height="10" fill="url(#hatch)"/>');
   }
   var POSTERS = [
-    { t: "Sentinel", d: "Plugin-based infra monitoring in Rust. Axum + SQLx, React dashboard, Slack and Kafka alerts.", c: ["Rust", "Axum", "Docker"], u: "https://github.com/Tanmaysarkar2002", x: 110 },
-    { t: "Data Harvester", d: "Universal web scraper with CAPTCHA solving, Google News, and RSS. Runs on AWS EC2.", c: ["Django", "React", "AWS"], u: "https://github.com/Tanmaysarkar2002/Universal-Scrapper", x: 420 },
-    { t: "LinkedIn Jobs", d: "Scrapes and indexes LinkedIn job listings, filtered by criteria you set.", c: ["Selenium", "Postgres"], u: "https://github.com/Tanmaysarkar2002/Linked__scraping__Database", x: 730 }
+    { t: "breakyouragent", d: "Crash-test your AI agent: hundreds of jailbreaks, prompt injections and tool-abuse attacks to show exactly where it breaks.", c: ["AI security", "LLMs"], u: "https://github.com/Tanmaysarkar2002/Breakyouragentlanginpage" },
+    { t: "StatLense", d: "Sentinel, productised. Open-source monitoring for Docker, databases and APIs, with a lightweight Rust agent.", c: ["Rust", "Axum", "React"], u: "https://github.com/Tanmaysarkar2002/SentinalLandingPage" },
+    { t: "docker-watchdog", d: "Real-time Docker monitor in Rust. Captures crash logs, auto-restarts containers, and has pluggable Slack/Kafka notifiers.", c: ["Rust", "Docker", "async"], u: "https://github.com/Tanmaysarkar2002/DockerWatchdog" },
+    { t: "Data Harvester", d: "Universal web scraper with CAPTCHA solving, Google News and RSS aggregation. Runs on AWS EC2.", c: ["Django", "React", "AWS"], u: "https://github.com/Tanmaysarkar2002/Universal-Scrapper" }
   ];
-  function ropeY(x) { var t = (x - 10) / 960; return (1 - t) * (1 - t) * 40 + 2 * t * (1 - t) * 170 + t * t * 40; }
+  var LINE_W = 1340;
+  function ropeY(x) { var t = (x - 10) / (LINE_W - 40); return (1 - t) * (1 - t) * 40 + 2 * t * (1 - t) * 300 + t * t * 40; }
   function washingLine() {
-    var art = svg(1000, 470,
-      '<path d="M10 470 V30 M990 470 V30" ' + S + ' stroke-width="6"/><path d="M-6 36 H26 M974 36 H1006" ' + S + ' stroke-width="4"/>' +
-      '<path d="M10 40 Q490 300 970 40" stroke="' + INK + '" stroke-width="2.2" fill="none"/>' +
-      '<path d="M200 ' + ropeY(200) + ' l10 18 l10 -16 M640 ' + ropeY(640) + ' l-8 20 l14 -6" stroke="' + INK + '" stroke-width="1.8" fill="#fff"/>');
+    var R = LINE_W - 10;
+    var art = svg(LINE_W, 470,
+      '<path d="M10 470 V30 M' + R + ' 470 V30" ' + S + ' stroke-width="6"/><path d="M-6 36 H26 M' + (R - 16) + " 36 H" + (R + 16) + '" ' + S + ' stroke-width="4"/>' +
+      '<path d="M10 40 Q' + LINE_W / 2 + " 300 " + (R - 20) + ' 40" stroke="' + INK + '" stroke-width="2.2" fill="none"/>' +
+      // a sock and a T-shirt drying between the posters
+      '<path d="M' + 282 + " " + ropeY(290) + " v26 q0 8 10 8 h8 v-8 h-6 v-26 z" + '" fill="#ffd166" ' + S + ' stroke-width="1.8"/>' +
+      '<path d="M' + 905 + " " + (ropeY(930) - 2) + " l-14 10 l6 8 l6 -4 v28 h34 v-28 l6 4 l6 -8 l-14 -10 q-8 6 -18 0 z" + '" fill="#a8c8ff" ' + S + ' stroke-width="1.8"/>');
     var html = POSTERS.map(function (p, i) {
-      return '<a class="poster" data-i="' + i + '" href="' + p.u + '" target="_blank" rel="noopener" style="left:' + p.x + "px;top:" + Math.round(ropeY(p.x + 95) + 14) + 'px">' +
+      var x = 40 + i * 320 + (i === 3 ? 10 : 0);
+      return '<a class="poster" data-i="' + i + '" href="' + p.u + '" target="_blank" rel="noopener" style="left:' + x + "px;top:" + Math.round(ropeY(x + 95) + 14) + 'px">' +
         "<h3>" + p.t + "</h3><p>" + p.d + '</p><div class="chips">' + p.c.map(function (c) { return "<span>" + c + "</span>"; }).join("") +
         '</div><span class="go">open code →</span></a>';
     }).join("");
     return art + html;
   }
+  function cow() {
+    return svg(140, 74,
+      '<path d="M14 72 Q8 40 36 34 L88 32 Q106 32 106 54 L106 72 Z" fill="' + PAPER + '" ' + S + "/>" +
+      '<ellipse cx="50" cy="46" rx="11" ry="7" fill="' + INK + '"/><ellipse cx="82" cy="56" rx="8" ry="6" fill="' + INK + '"/>' +
+      '<path d="M30 72 q4 -9 16 -7 M74 72 q6 -9 18 -5" ' + S + ' fill="none"/>' +
+      '<path d="M100 38 Q110 22 124 26 Q134 34 128 48 Q120 54 110 50 Z" fill="' + PAPER + '" ' + S + "/>" +
+      '<ellipse cx="128" cy="44" rx="6" ry="5" fill="#f2b8a0" ' + S + ' stroke-width="1.6"/><circle cx="116" cy="34" r="1.8" fill="' + INK + '"/>' +
+      '<path d="M108 26 q-4 -10 2 -14 M118 22 q2 -10 10 -10 M104 32 l-10 -2 l6 9" ' + S + ' stroke-width="2" fill="none"/>' +
+      '<circle cx="106" cy="58" r="4" fill="#ffd166" ' + S + ' stroke-width="1.4"/>', true,
+      '<path class="tail" d="M16 50 q-14 4 -12 20 l-3 4" stroke="' + INK + '" stroke-width="2.4" fill="none" stroke-linecap="round" style="transform-origin:16px 50px"/>');
+  }
+  function sleepyDog() {
+    return svg(110, 70,
+      '<ellipse cx="50" cy="52" rx="36" ry="15" fill="#e8c99a" ' + S + "/>" +
+      '<path d="M16 52 q-12 -2 -8 -12" ' + S + ' fill="none"/>' +
+      '<circle cx="82" cy="50" r="13" fill="#e8c99a" ' + S + "/>" +
+      '<path d="M76 40 q-4 -10 6 -10 q2 6 0 10" fill="#b8865a" ' + S + ' stroke-width="1.8"/>' +
+      '<path d="M84 50 q4 3 8 0" ' + S + ' stroke-width="1.6" fill="none"/><circle cx="94" cy="56" r="2.4" fill="' + INK + '"/>' +
+      '<path d="M30 46 q8 -6 16 0 M52 44 q8 -6 16 0" stroke="' + INK + '" stroke-width="1.2" fill="none" opacity=".5"/>', true,
+      '<g class="zzz" ' + HAND + ' font-size="16" fill="' + INK + '"><text x="92" y="28">z</text><text x="100" y="16" font-size="12">z</text><text x="106" y="6" font-size="9">z</text></g>');
+  }
+  var COW_X = 4150;
+
   function chaiStall() {
     var stripes = "";
     for (var i = 0; i < 10; i++) stripes += '<path d="M' + (i * 32) + " 40 h32 v42 a16 12 0 0 1 -32 0 z" + '" fill="' + (i % 2 ? PAPER : ACCENT) + '" ' + S + ' stroke-width="2"/>';
@@ -354,6 +624,8 @@
     [CHECKPOINTS[4].x + 300, jaipur()],
     [CHECKPOINTS[5].x + 320, pitstop()],
     [CHECKPOINTS[6].x + 120, washingLine(), "line"],
+    [COW_X, cow() + '<div class="bubble">moo!</div>', "cow"],
+    [CHECKPOINTS[5].x + 820, sleepyDog(), "dog"],
     [END + 200, chaiStall(), "chai"]
   ];
   var CHAI_X = END + 200;
@@ -371,7 +643,7 @@
     g.insertAdjacentHTML("beforeend", html);
     // Size the washing-line container so the HTML posters sit on the rope.
     var line = g.querySelector(".landmark.line");
-    line.style.width = "1000px"; line.style.height = "470px";
+    line.style.width = LINE_W + "px"; line.style.height = "470px";
     var chai = g.querySelector(".landmark.chai");
     chai.style.width = "560px"; chai.style.height = "290px";
   }
@@ -622,6 +894,7 @@
   var beam = $("#beam"), speedlines = $("#speedlines"), root = document.documentElement;
   var posters = [].slice.call(document.querySelectorAll(".poster"));
   var cur = 0, last = performance.now(), dist = 0, lastNight = -1, lastActive = null;
+  var autoEl = $("#auto"), autoX = 1400, cowBubble = null;
   var speed = 0, prevSpeed = 0, wheelie = 0, clock = 0, lastRs = null;
 
   function frame(now) {
@@ -679,6 +952,13 @@
     engineSound(kmh, gearFrac);
     if (kmh >= 60) unlock("speed");
 
+    // Oncoming auto-rickshaw in the far lane.
+    autoX -= 240 * dt;
+    var autoScreen = autoX - camX;
+    if (autoScreen < -260 || autoScreen > vw + 2600) { autoX = camX + vw + 300 + Math.random() * 1800; autoScreen = autoX - camX; }
+    autoEl.style.transform = "translate3d(" + autoScreen.toFixed(1) + "px,0,0) scale(" + (mobile ? 0.65 : 1) + ")";
+    if (cowBubble) cowBubble.classList.toggle("show", Math.abs(cur - (COW_X - 480)) < 260);
+
     // Exhaust
     puffT -= dt;
     if (puffT <= 0) { spawnPuff(); puffT = kmh > 3 ? Math.max(0.05, 0.14 - kmh / 900) : 0.55; }
@@ -732,7 +1012,8 @@
   // ------------------------------------------------------------------
   // Boot
   // ------------------------------------------------------------------
-  buildSky(); buildClouds(); buildFar(); buildMid(); buildNear(); buildGround(); buildGlow(); buildSpeedo();
+  buildSky(); buildClouds(); buildFar(); buildMid(); buildNear(); buildFront(); buildGround(); buildGlow(); buildSpeedo();
+  cowBubble = document.querySelector(".cow .bubble");
   renderTrophies();
   layout();
   var wasMobile = isMobile();

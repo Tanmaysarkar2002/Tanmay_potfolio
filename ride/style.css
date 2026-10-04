@@ -213,6 +213,33 @@ button { font: inherit; color: inherit; }
 .steam.s2 { animation-delay: -1.1s; }
 @keyframes steam { 0% { opacity: 0; transform: translateY(6px); } 50% { opacity: .7; } 100% { opacity: 0; transform: translateY(-10px); } }
 
+/* Living scenery */
+.blades { transform-box: view-box; animation: spin 5s linear infinite; }
+.kite { transform-box: view-box; animation: kite 3.4s ease-in-out infinite alternate; }
+@keyframes kite { from { transform: rotate(-4deg); } to { transform: rotate(5deg); } }
+.balloon { animation: balloon 7s ease-in-out infinite; }
+@keyframes balloon { 50% { transform: translateY(-18px); } }
+.bob { animation: bob-boat 2.6s ease-in-out infinite; }
+@keyframes bob-boat { 50% { transform: translateY(2px) rotate(1deg); } }
+.tail { transform-box: view-box; animation: swish 1.6s ease-in-out infinite alternate; }
+@keyframes swish { from { transform: rotate(-14deg); } to { transform: rotate(16deg); } }
+.zzz text { animation: zzz 2.4s ease-in-out infinite; }
+.zzz text:nth-child(2) { animation-delay: .4s; } .zzz text:nth-child(3) { animation-delay: .8s; }
+@keyframes zzz { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+.landmark .bubble { position: absolute; right: -36px; top: -34px; font: 20px var(--sketch); background: var(--paper-2); border: 2px solid var(--ink); border-radius: 14px 14px 14px 2px; padding: 0 10px; opacity: 0; transform: scale(.6); transition: .25s; }
+.landmark .bubble.show { opacity: 1; transform: rotate(-6deg); }
+.flock { position: absolute; left: 0; top: 14%; width: 120px; animation: fly 30s linear infinite; pointer-events: none; }
+.flock.f2 { top: 26%; width: 90px; animation-duration: 38s; animation-delay: -17s; }
+.flock svg { display: block; width: 100%; overflow: visible; }
+.flock path { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; transform-box: fill-box; transform-origin: center; animation: flapw .5s ease-in-out infinite alternate; }
+.flock path:nth-child(2n) { animation-delay: -.25s; }
+@keyframes flapw { to { transform: scaleY(-.5); } }
+@keyframes fly { from { transform: translateX(110vw); } to { transform: translateX(-30vw) translateY(-40px); } }
+.auto { position: absolute; left: 0; bottom: calc(var(--road-h) - 22px); z-index: 3; transform-origin: bottom left; will-change: transform; pointer-events: none; }
+.auto svg { display: block; overflow: visible; }
+.auto .w { animation: spin .5s linear infinite reverse; }
+#front { bottom: -4px; z-index: 5; pointer-events: none; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 760px) {
   :root { --road-h: 76px; }
@@ -237,6 +264,6 @@ button { font: inherit; color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .card { transition: opacity .2s; }
-  .stars span, .doodles span, .sun svg, .speedlines i, #glow .bulb { animation: none; }
+  .stars span, .doodles span, .sun svg, .speedlines i, #glow .bulb, .blades, .kite, .bob, .balloon, .tail, .flock, .flock path, .auto .w { animation: none; }
   .rider .scarf { animation: none; }
 }

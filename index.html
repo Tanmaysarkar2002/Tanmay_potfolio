@@ -72,9 +72,15 @@
     <div class="sky" id="sky"><div class="sky-wash" id="sky-wash"></div></div>
     <div class="sun" id="sun"></div>
     <div class="layer" id="clouds" data-f="0.08"></div>
+    <div class="flock" aria-hidden="true">
+      <svg viewBox="0 0 120 50"><path d="M0 20 q7 -8 14 0 q7 -8 14 0"/><path d="M34 6 q6 -7 12 0 q6 -7 12 0"/><path d="M40 34 q6 -7 12 0 q6 -7 12 0"/><path d="M70 18 q5 -6 10 0 q5 -6 10 0"/></svg>
+    </div>
+    <div class="flock f2" aria-hidden="true">
+      <svg viewBox="0 0 120 50"><path d="M0 20 q7 -8 14 0 q7 -8 14 0"/><path d="M30 34 q6 -7 12 0 q6 -7 12 0"/><path d="M52 10 q5 -6 10 0 q5 -6 10 0"/></svg>
+    </div>
     <div class="layer" id="far" data-f="0.15"></div>
-    <div class="layer" id="mid" data-f="0.35"></div>
-    <div class="layer" id="near" data-f="0.6"></div>
+    <div class="layer" id="mid" data-f="0.5"></div>
+    <div class="layer" id="near" data-f="0.75"></div>
     <div class="layer ground" id="ground" data-f="1">
       <div class="road"><div class="road-line"></div><div class="road-edge"></div></div>
     </div>
@@ -99,6 +105,23 @@
       <p class="role">&lt; <b>backend</b> &amp; <b>infra</b> engineer /&gt;</p>
     </section>
 
+    <div class="auto" id="auto" aria-hidden="true">
+      <svg viewBox="0 0 140 100" width="140" height="100">
+        <g filter="url(#rough)" stroke="#1f1f24" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M34 10 Q78 -2 124 10 L126 50 L34 50 Z" fill="#2b2d42"/>
+          <path d="M34 10 Q78 -2 124 10" fill="none" stroke="#ffd166" stroke-width="4"/>
+          <path d="M14 80 L20 40 Q24 26 36 24 L36 80 Z" fill="#ffd166"/>
+          <rect x="36" y="50" width="92" height="30" rx="4" fill="#7cc36a"/>
+          <path d="M24 40 L32 26 L36 26 L36 50 L26 50 Z" fill="#fbfaf6"/>
+          <path d="M60 50 V22 M100 50 V18" fill="none"/>
+          <circle cx="56" cy="36" r="6" fill="#e8c99a"/>
+          <circle cx="18" cy="58" r="4.5" fill="#fff6d8"/>
+          <path d="M40 62 H120" stroke-width="1.4" fill="none"/>
+        </g>
+        <g class="w" style="transform-origin:28px 84px"><circle cx="28" cy="84" r="11" fill="#1f1f24"/><path d="M20 84 H36 M28 76 V92" stroke="#fbfaf6" stroke-width="2"/></g>
+        <g class="w" style="transform-origin:108px 84px"><circle cx="108" cy="84" r="13" fill="#1f1f24"/><path d="M98 84 H118 M108 74 V94" stroke="#fbfaf6" stroke-width="2"/></g>
+      </svg>
+    </div>
     <div class="beam" id="beam"></div>
     <div class="speedlines" id="speedlines"><i style="top:10px;width:70px"></i><i style="top:34px;width:110px;animation-delay:-.12s"></i><i style="top:58px;width:60px;animation-delay:-.22s"></i><i style="top:80px;width:90px;animation-delay:-.05s"></i></div>
     <div id="puffs"></div>
@@ -151,6 +174,8 @@
         </g>
       </svg>
     </div>
+
+    <div class="layer" id="front" data-f="1.25" aria-hidden="true"></div>
 
     <!-- Checkpoint notes -->
     <div class="cards">
