@@ -1226,7 +1226,12 @@
   });
 
   var cards = {};
-  [].forEach.call(document.querySelectorAll(".card"), function (el) { cards[el.getAttribute("data-cp")] = el; });
+  // Fade the bottom of a note while it has more to scroll, so phones show there's more below.
+  function markMore(el) { el.classList.toggle("more", el.scrollTop + el.clientHeight < el.scrollHeight - 8); }
+  [].forEach.call(document.querySelectorAll(".card"), function (el) {
+    cards[el.getAttribute("data-cp")] = el;
+    el.addEventListener("scroll", function () { markMore(el); });
+  });
 
   var space = $("#scroll-space");
   function maxScroll() { return Math.max(1, document.documentElement.scrollHeight - window.innerHeight); }
@@ -1381,7 +1386,7 @@
     }
     if (active !== lastActive) {
       if (lastActive && cards[lastActive]) cards[lastActive].classList.remove("active");
-      if (active && cards[active]) cards[active].classList.add("active");
+      if (active && cards[active]) { cards[active].classList.add("active"); markMore(cards[active]); }
       if (active) unlock(active);
       lastActive = active;
     }
