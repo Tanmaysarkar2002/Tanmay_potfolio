@@ -1061,10 +1061,12 @@
     var d = document.createElement("div"); d.className = "puff"; d.style.opacity = 0; puffLayer.appendChild(d);
     puffPool.push({ el: d, life: 0 });
   }
+  var riderBox = null;
   function spawnPuff() {
     var p = puffPool.filter(function (q) { return q.life <= 0; })[0];
     if (!p) return;
-    var r = riderEl.getBoundingClientRect(), k = r.width / 240;
+    if (!riderBox) riderBox = riderEl.getBoundingClientRect(); // only changes on resize
+    var r = riderBox, k = r.width / 240;
     p.x = r.left + 18 * k - 9; p.y = r.top + 129 * k - 9; p.life = 1; p.vx = -20 - Math.random() * 30; p.vy = -14 - Math.random() * 14;
   }
   function updatePuffs(dt, camDx) {
@@ -1082,7 +1084,7 @@
   // Weather: monsoon rain in Pune, dust in Jaipur, snow in Ladakh
   // ------------------------------------------------------------------
   var wCanvas = $("#weather"), wctx = wCanvas.getContext("2d"), haze = $("#haze"), roadH = 100, dpr = 1;
-  var drops = [], flakes = [], dust = [], splashes = [];
+  var drops = [], flakes = [], dust = [], splashes = [], weatherDrawn = false;
   function sizeWeather() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
     wCanvas.width = Math.round(window.innerWidth * dpr); wCanvas.height = Math.round(window.innerHeight * dpr);
@@ -1097,8 +1099,13 @@
     var rain = band(4100, 5800, 300), sand = band(6000, 7600, 300), snow = band(9300, 10900, 300);
     haze.style.background = rain > 0 ? "rgba(70, 90, 120," + (rain * 0.16).toFixed(3) + ")" : sand > 0 ? "rgba(240, 170, 90," + (sand * 0.14).toFixed(3) + ")" : "transparent";
     wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (reduceMotion || (rain + sand + snow) === 0) {
+      if (weatherDrawn) { wctx.clearRect(0, 0, vw, vh); weatherDrawn = false; }
+      drops.length = flakes.length = dust.length = splashes.length = 0;
+      return;
+    }
     wctx.clearRect(0, 0, vw, vh);
-    if (reduceMotion || (rain + sand + snow) === 0) { drops.length = flakes.length = dust.length = splashes.length = 0; return; }
+    weatherDrawn = true;
     var ground = vh - roadH + 26;
     fillPool(drops, Math.round(rain * 170), function () { return { x: Math.random() * (vw + 200), y: Math.random() * vh, l: 12 + Math.random() * 14, v: 700 + Math.random() * 300 }; });
     fillPool(flakes, Math.round(snow * 110), function () { return { x: Math.random() * (vw + 200), y: Math.random() * vh, r: 1.6 + Math.random() * 2.6, v: 30 + Math.random() * 50, p: Math.random() * 6 }; });
@@ -1282,6 +1289,8 @@
   // ------------------------------------------------------------------
   var hero = $("#hero"), doodles = $("#doodles"), skyWash = $("#sky-wash"), sun = $("#sun"), moon = $("#moon");
   var beam = $("#beam"), speedlines = $("#speedlines");
+  var lastWash = "";
+  var nightEls = [[$(".night"), 0.72], [$("#stars"), 1], [$("#moon"), 1], [$("#glow"), 1], [beam, 1]];
   var posters = [].slice.call(document.querySelectorAll(".poster"));
   var cur = 0, last = performance.now(), dist = 0, lastNight = -1, lastActive = null;
   var cowBubble = null, regionGroups = [];
@@ -1317,6 +1326,7 @@
       beam.style.transform = "translate3d(" + (rs + 186 * k).toFixed(1) + "px,0,0)";
       speedlines.style.left = (rs - 120 * k) + "px";
       lastRs = rs;
+      riderBox = null;
     }
 
     // Speed, wheelie, vibration.
@@ -1358,8 +1368,13 @@
 
     // Sky / time of day.
     var p = cur / END, sk = sky(p);
-    skyWash.style.background = "linear-gradient(" + sk.wash + ", transparent 75%)";
-    if (Math.abs(sk.night - lastNight) > 0.004) { root.style.setProperty("--night", sk.night.toFixed(3)); lastNight = sk.night; }
+    if (sk.wash !== lastWash) { skyWash.style.background = "linear-gradient(" + sk.wash + ", transparent 75%)"; lastWash = sk.wash; }
+    if (Math.abs(sk.night - lastNight) > 0.004) {
+      // Set opacity on the few night elements directly. Changing a CSS variable on the root
+      // instead restyles every element on the page each frame, which made phones stutter at dusk.
+      nightEls.forEach(function (n) { n[0].style.opacity = (sk.night * n[1]).toFixed(3); });
+      lastNight = sk.night;
+    }
     if (sk.night > 0.6) unlock("night");
     var sp = Math.min(1, p / 0.9);
     sun.style.transform = "translate(" + (vw * (0.12 + sp * 0.76) - 60).toFixed(0) + "px," + (vh * (0.5 - Math.sin(sp * Math.PI) * 0.4) + Math.max(0, p - 0.82) * vh * 3).toFixed(0) + "px)";
@@ -1414,7 +1429,7 @@
   var wasMobile = isMobile();
   sizeWeather();
   window.addEventListener("resize", function () {
-    layout(); sizeWeather();
+    layout(); sizeWeather(); riderBox = null;
     if (isMobile() !== wasMobile) { wasMobile = isMobile(); buildGlow(); }
   });
   setSound(false);

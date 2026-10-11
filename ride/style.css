@@ -9,7 +9,6 @@
   --paper-2: #fbfaf6;
   --accent: #ff6b35;
   --tape: rgba(120, 170, 255, .55);
-  --night: 0;
   --road-h: 100px;
   --hand: "Patrick Hand", "Comic Sans MS", cursive;
   --sketch: "Cabin Sketch", "Patrick Hand", cursive;
@@ -56,12 +55,12 @@ button { font: inherit; color: inherit; }
 .landmark > svg { display: block; overflow: visible; }
 
 /* Night */
-.night { position: absolute; inset: 0; background: #10132f; opacity: calc(var(--night) * .72); mix-blend-mode: multiply; pointer-events: none; }
-.stars { position: absolute; inset: 0 0 35% 0; opacity: var(--night); pointer-events: none; }
+.night { position: absolute; inset: 0; background: #10132f; opacity: 0; mix-blend-mode: multiply; pointer-events: none; }
+.stars { position: absolute; inset: 0 0 35% 0; opacity: 0; pointer-events: none; }
 .stars span { position: absolute; color: #fdf6d8; font: 700 14px var(--hand); animation: twinkle 3s ease-in-out infinite; }
 @keyframes twinkle { 50% { opacity: .3; transform: scale(.8) rotate(20deg); } }
-.moon { opacity: var(--night); }
-#glow { opacity: var(--night); pointer-events: none; }
+.moon { opacity: 0; }
+#glow { opacity: 0; pointer-events: none; }
 #glow .lamp { position: absolute; bottom: calc(var(--road-h) + 136px); width: 160px; height: 160px; margin-left: -80px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 214, 120, .85) 0 8%, rgba(255, 200, 90, .25) 30%, transparent 68%); }
 #glow .warm { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(255, 196, 92, .55), transparent 70%); }
 #glow .bulb { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #ffe08a; box-shadow: 0 0 10px 4px rgba(255, 210, 100, .7); animation: twinkle 2.4s ease-in-out infinite; }
@@ -79,7 +78,7 @@ button { font: inherit; color: inherit; }
   position: absolute; left: 0; bottom: 0; width: 520px; height: 180px; z-index: 3; pointer-events: none;
   background: radial-gradient(ellipse at 0% 50%, rgba(255, 236, 170, .75), rgba(255, 236, 170, .18) 45%, transparent 70%);
   clip-path: polygon(0 44%, 100% 0, 100% 100%, 0 56%);
-  opacity: var(--night); will-change: transform; mix-blend-mode: screen;
+  opacity: 0; will-change: transform; mix-blend-mode: screen;
 }
 .speedlines { position: absolute; left: 0; bottom: calc(var(--road-h) + 30px); width: 160px; height: 90px; z-index: 3; pointer-events: none; opacity: 0; will-change: transform, opacity; }
 .speedlines i { position: absolute; height: 2px; background: var(--ink); border-radius: 2px; animation: dash .35s linear infinite; }
